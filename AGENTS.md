@@ -24,9 +24,13 @@ composeApp/src/androidMain/ MainActivity, AndroidLogFileIo, Clock, manifest, res
 composeApp/src/iosMain/     MainViewController, IosLogFileIo, Clock.
 composeApp/src/commonMain/composeResources/drawable/  reef_<spot>.png overlays (14).
 tools/sdb/    Python: satellite-derived-bathymetry pipeline (the moat). See its README.
+iosApp/       Xcode project (ported from slovo). Thin: AppDelegate/SceneDelegate
+              hand off to MainViewController(); a Run Script phase builds the
+              KMP framework (:composeApp:embedAndSignAppleFrameworkForXcode).
 docs/         OPPORTUNITY, ECONOMICS (rationale + costs), release-android, ARCHITECTURE.
 store-assets/ Play listing metadata + placeholder images.
-fastlane/     Android/Play release lanes (see docs/release-android.md).
+fastlane/     Android/Play + iOS/TestFlight release lanes (see docs/release-android.md
+              and the Fastfile header for the iOS signing model).
 ```
 
 ## Conventions
@@ -57,6 +61,13 @@ fastlane/     Android/Play release lanes (see docs/release-android.md).
 ```bash
 ./gradlew :composeApp:allTests        # pure commonTest suite (36 tests)
 ./gradlew :composeApp:assembleDebug   # sideloadable debug APK
+# iOS (needs Xcode + a JDK): open iosApp/iosApp.xcodeproj, or headless
+# (ARCHS=arm64 is required — the generic sim destination otherwise adds x86_64,
+# and the project has no iosX64 target; sim *tests* also need one simulator
+# device to exist: xcrun simctl create ...):
+xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp \
+  -destination 'generic/platform=iOS Simulator' ARCHS=arm64 \
+  CODE_SIGNING_ALLOWED=NO build
 ```
 No local build env? Every green CI run publishes the APK as the
 `balisurf-debug-apk` artifact (Actions → CI) — download + sideload. See README.
@@ -82,8 +93,11 @@ against control points. `composite.py` medians multiple scenes for cloudy spots.
 
 ## What's deliberately NOT done (next steps)
 
-- **iOS release** — no Xcode project yet (the KMP framework builds, but there's no
-  `iosApp/`). Port slovo's `platform :ios` fastlane block + add the Xcode project.
+- **First TestFlight build** — the iOS pipeline (iosApp/, fastlane ios lanes,
+  ios-testflight.yml) is wired but has never shipped: needs the App Store Connect
+  app record, `fastlane ios signing_assets` run once locally, and the ASC_*/
+  DIST_CERT_* CI secrets. No iOS store metadata/screenshots in store-assets/ yet
+  (the `ios release` lane will error until they exist).
 - **Real spot-rule calibration** — needs field session logs or your local knowledge.
 - **Backend fan-out** — client-direct is fine < ~500 users; see docs/ECONOMICS.md.
 - **6 spots lack reef overlays** (boat-access/deep-water SDB failures).

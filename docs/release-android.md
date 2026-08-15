@@ -5,8 +5,8 @@ it to Play via fastlane `supply`, degrading gracefully: no signing secret →
 unsigned artifact only; no Play key → build-only, no upload. **Nothing here was
 built or run in the authoring environment** (no JDK/Android SDK) — the Gradle
 build and every fastlane lane are prepared blind and must be exercised on a Mac /
-in CI. iOS is not wired yet (no Xcode project); port slovo's `platform :ios` block
-when it is.
+in CI. iOS is wired separately: `iosApp/` + the `platform :ios` lanes in the
+Fastfile (see its header for the signing model) + `.github/workflows/ios-testflight.yml`.
 
 ## What only a human can do (blockers)
 

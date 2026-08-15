@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>method</key>
+  <string>app-store-connect</string>
+  <key>teamID</key>
+  <string>7JF6XQC536</string>
+  <key>destination</key>
+  <string>export</string>
+  <!-- Manual signing with the sigh-created profile. "automatic" here means Xcode
+       cloud signing, which fails locally with "Cloud signing permission error".
+       The fastlane beta lane passes its own export_options; this file is for a
+       standalone `xcodebuild -exportArchive` run. -->
+  <key>signingStyle</key>
+  <string>manual</string>
+  <key>provisioningProfiles</key>
+  <dict>
+    <key>cx.viz.balisurf</key>
+    <string>cx.viz.balisurf AppStore</string>
+  </dict>
+  <key>stripSwiftSymbols</key>
+  <true/>
+  <key>uploadSymbols</key>
+  <true/>
+</dict>
+</plist>

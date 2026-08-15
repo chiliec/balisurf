@@ -1,4 +1,4 @@
 app_identifier("cx.viz.balisurf")
+team_id("7JF6XQC536") # Vladimir Babin — Apple Developer Program team
 
-# No apple_id / itc login. iOS release is not wired yet (no Xcode project in the
-# repo); when it is, add team_id here and port slovo's ios platform block.
+# No apple_id / itc login: all App Store Connect auth is via the API key.

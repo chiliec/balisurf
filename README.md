@@ -36,8 +36,9 @@ Working v0.1 — builds for Android + iOS, CI green, sideloadable APK on every r
 - Live data via Open-Meteo Marine + Forecast APIs (free tier, no key).
 
 **Honest caveats:** spot rules are estimates pending real-session calibration;
-the launcher icon + store art are placeholders; iOS has no Xcode project yet
-(the KMP framework builds, but there's no `iosApp/`).
+the launcher icon + store art are placeholders; the iOS TestFlight pipeline is
+wired but has never shipped a build (needs the App Store Connect app record +
+CI secrets).
 
 ## Architecture
 
@@ -92,9 +93,10 @@ This is a debug build — unsigned for Play, but perfect for field-testing the
 verdicts against real surf. The Play release pipeline (`docs/release-android.md`)
 is for public distribution.
 
-iOS: no Xcode project yet. The KMP framework builds (`ComposeApp`), but an
-`iosApp/` Xcode project still needs adding before it runs on a device — see
-`AGENTS.md` "What's deliberately NOT done".
+iOS: open `iosApp/iosApp.xcodeproj` in Xcode and run on a simulator (the Run
+Script phase builds the KMP framework via Gradle). Device installs and
+TestFlight need the Apple signing assets — see `fastlane/Fastfile` (ios
+platform) and `.github/workflows/ios-testflight.yml`.
 
 ## Data attribution
 
@@ -108,13 +110,14 @@ Reef bathymetry is derived from Copernicus Sentinel-2 imagery (see
 
 Done: verdict engine, region-grouped 20-spot catalog, 24h timeline, free tide
 times, satellite reef overlays (14/20), session-logging crowdsource loop,
-Android/Play release pipeline. Next, in rough order:
+Android/Play release pipeline, iOS app + TestFlight pipeline. Next, in rough
+order:
 
 1. **Calibrate spot rules** against real session logs / local knowledge (the
    rules are estimates). Every change pinned by a `SpotScorerTest`.
-2. **iOS**: add the `iosApp/` Xcode project + port slovo's `platform :ios`
-   fastlane block.
-3. **Replace placeholders**: launcher icon, Play store art.
+2. **First TestFlight build**: create the App Store Connect app record, run
+   `fastlane ios signing_assets`, set the CI secrets (see `fastlane/Fastfile`).
+3. **Replace placeholders**: launcher icon, iOS app icon, Play store art.
 4. **Reef overlays for the last 6 spots** (boat-access/deep — harder; try AOI
    shifts + `composite.py`).
 5. **Backend fan-out** once past ~500 users (see `docs/ECONOMICS.md`).

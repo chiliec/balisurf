@@ -1,14 +1,31 @@
-# BaliSurf — Google Play release automation (Android).
+# BaliSurf — release automation. Ported from chiliec/slovo's Fastfile.
 #
-# Ported from chiliec/slovo's Android platform block. iOS is not wired yet (no
-# Xcode project in the repo); when it is, port slovo's `platform :ios` block.
+# iOS (TestFlight + App Store): gym archives the committed iosApp Xcode project
+# (its Run Script phase shells to ./gradlew
+# :composeApp:embedAndSignAppleFrameworkForXcode to build the Compose
+# Multiplatform framework), an Apple Distribution certificate plus a
+# sigh-fetched App Store provisioning profile provide signing, and pilot
+# uploads to TestFlight. All App Store Connect auth is via the API key — no
+# Apple ID, no 2FA, and no separate certs repo.
 #
-# Pipeline: gradle builds the signed AAB (upload key from the gitignored
-# keystore.properties at the repo root), supply pushes it plus the listing to
-# Google Play. Play App Signing means Google holds the real app signing key; we
-# only ever hold the upload key.
+# iOS signing model (no match, no extra repo):
+#   * Apple Distribution cert + key: base64 .p12 in DIST_CERT_P12. CI imports it
+#     into a temp keychain each run.
+#   * App Store provisioning profile: fetched/created fresh each run with sigh via
+#     the API key (always re-downloadable from Apple).
+#   Run `bundle exec fastlane ios signing_assets` ONCE locally to create the cert
+#   and produce the .p12 to base64 into the DIST_CERT_P12 secret.
+#
+# Android (Google Play): gradle builds the signed AAB (upload key from the
+# gitignored keystore.properties at the repo root), supply pushes it plus the
+# listing to Google Play. Play App Signing means Google holds the real app
+# signing key; we only ever hold the upload key.
 #
 # Local usage:
+#   bundle exec fastlane ios signing_assets       # one-time: create cert + profile
+#   bundle exec fastlane ios beta                 # build + upload to TestFlight
+#   bundle exec fastlane ios release              # push listing text + screenshots
+#   bundle exec fastlane ios submit               # submit for App Store review
 #   bundle exec fastlane android play_stage       # stage listing only, no auth needed
 #   bundle exec fastlane android bundle           # build the AAB (no auth)
 #   bundle exec fastlane android play_internal    # build AAB + upload to internal track
@@ -17,6 +34,12 @@
 #   bundle exec fastlane android play_promote     # internal -> production
 #
 # Required environment (fastlane/.env locally; GitHub secrets in CI):
+#   ASC_KEY_ID            App Store Connect API Key ID
+#   ASC_ISSUER_ID         App Store Connect API Issuer ID (UUID)
+#   ASC_KEY_P8            The .p8 private key CONTENTS (base64) — CI only
+#   DIST_CERT_P12         Apple Distribution cert+key as base64 .p12 — CI only
+#   DIST_CERT_PASSWORD    Password the .p12 was exported with (may be empty)
+#   APP_VERSION           iOS marketing version to operate on (default 1.0.0)
 #   PLAY_JSON_KEY         Play service account JSON contents (base64) — CI only
 #   ANDROID_VERSION_CODE  Pin the versionCode; the upload lanes otherwise derive it
 # Upload-key signing. The lanes read the gitignored keystore.properties at the
@@ -26,14 +49,237 @@
 #   ANDROID_KEY_ALIAS          keyAlias (currently "balisurf")
 #   ANDROID_KEY_PASSWORD       keyPassword
 #
-# Prerequisites that need a human once (see docs/release-android.md):
-#   * Play Console account, app record for cx.viz.balisurf, Play App Signing enrolled.
-#   * A service account JSON key with "Release manager" access, saved to the repo
-#     root as play-service-account.json (gitignored) or base64 in PLAY_JSON_KEY.
+# Prerequisites that need a human once:
+#   * Play Console account, app record for cx.viz.balisurf, Play App Signing
+#     enrolled, service account JSON with "Release manager" access (see
+#     docs/release-android.md).
+#   * App Store Connect: app record for cx.viz.balisurf + an API key with
+#     App Manager access.
 
 require "base64"
 
 default_platform(:android)
+
+# ---------------------------------------------------------------------------
+# iOS / TestFlight + App Store
+# ---------------------------------------------------------------------------
+
+APP_IDENTIFIER = "cx.viz.balisurf"
+XCODEPROJ = File.expand_path("../iosApp/iosApp.xcodeproj", __dir__)
+SCHEME    = ENV.fetch("IOS_SCHEME", "iosApp")
+# Marketing version the release/submit lanes operate on. Keep in sync with
+# MARKETING_VERSION in the Xcode project.
+APP_VERSION = ENV.fetch("APP_VERSION", "1.0.0")
+# setup_ci creates this keychain on CI; import_certificate must target it.
+CI_KEYCHAIN = "fastlane_tmp_keychain"
+
+# Loads the App Store Connect API key. Accepts the .p8 either as base64 contents
+# in ASC_KEY_P8 (CI) or, for local dev, a gitignored AuthKey_<id>.p8 in the repo
+# root.
+def asc_api_key
+  if ENV["ASC_KEY_P8"] && !ENV["ASC_KEY_P8"].empty?
+    app_store_connect_api_key(
+      key_id: ENV.fetch("ASC_KEY_ID"),
+      issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+      key_content: ENV.fetch("ASC_KEY_P8"),
+      is_key_content_base64: true,
+      in_house: false
+    )
+  else
+    key_path = Dir[File.expand_path("../AuthKey_*.p8", __dir__)].first
+    UI.user_error!("No ASC_KEY_P8 env and no AuthKey_*.p8 in the repo root") unless key_path
+    app_store_connect_api_key(
+      key_id: ENV.fetch("ASC_KEY_ID", File.basename(key_path)[/AuthKey_(.+)\.p8/, 1]),
+      issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+      key_filepath: key_path,
+      in_house: false
+    )
+  end
+end
+
+# On CI, imports the base64 Apple Distribution .p12 into the temp keychain.
+# Locally this is a no-op — the cert is expected in the login keychain.
+def import_dist_cert
+  return unless ENV["DIST_CERT_P12"] && !ENV["DIST_CERT_P12"].empty?
+  p12_path = File.expand_path("../build/dist_cert.p12", __dir__)
+  FileUtils.mkdir_p(File.dirname(p12_path))
+  File.binwrite(p12_path, Base64.decode64(ENV["DIST_CERT_P12"]))
+  import_certificate(
+    certificate_path: p12_path,
+    certificate_password: ENV["DIST_CERT_PASSWORD"].to_s,
+    keychain_name: CI_KEYCHAIN,
+    keychain_password: ""
+  )
+ensure
+  FileUtils.rm_f(p12_path) if defined?(p12_path) && p12_path
+end
+
+# On CI, imports the Apple WWDR intermediate certificates into the temp keychain.
+# Without them the distribution cert's chain cannot be validated, so
+# `security find-identity -v -p codesigning` reports no identities. No-op locally.
+def import_apple_wwdr
+  return unless ENV["CI"]
+  %w[AppleWWDRCAG3 AppleWWDRCAG6].each do |name|
+    path = File.expand_path("../build/#{name}.cer", __dir__)
+    FileUtils.mkdir_p(File.dirname(path))
+    next unless system("curl", "-fsSL", "https://www.apple.com/certificateauthority/#{name}.cer", "-o", path)
+    import_certificate(certificate_path: path, keychain_name: CI_KEYCHAIN, keychain_password: "")
+  end
+end
+
+platform :ios do
+  desc "One-time (local): create the Apple Distribution cert + App Store profile"
+  lane :signing_assets do
+    api_key = asc_api_key
+    out = File.expand_path("../build/certs", __dir__)
+    FileUtils.mkdir_p(out)
+    # Creates (or downloads) the Apple Distribution certificate + private key.
+    cert(api_key: api_key, output_path: out)
+    # Creates/downloads the App Store provisioning profile.
+    get_provisioning_profile(
+      api_key: api_key, app_identifier: APP_IDENTIFIER, readonly: false, output_path: out
+    )
+    UI.success("Signing assets in #{out}.")
+    UI.message("Export the cert+key as a .p12 (Keychain Access, or the .p12 in that dir),")
+    UI.message("then: base64 -i <that>.p12 | pbcopy  ->  paste into the DIST_CERT_P12 secret.")
+  end
+
+  desc "Build and upload a new build to TestFlight"
+  lane :beta do
+    api_key = asc_api_key
+
+    # CI prepares the signing keychain in a dedicated workflow step (manual
+    # `security` setup with key-partition-list). Skip fastlane's own keychain
+    # handling there; still run it for local invocations.
+    unless ENV["SKIP_KEYCHAIN_SETUP"]
+      setup_ci if ENV["CI"]     # temp keychain on CI (no-op locally)
+      import_apple_wwdr          # CI: WWDR intermediates so the cert chain validates
+      import_dist_cert           # CI: load the distribution cert from the secret
+    end
+
+    # Fetch/create the App Store provisioning profile via the API key.
+    get_provisioning_profile(
+      api_key: api_key,
+      app_identifier: APP_IDENTIFIER,
+      readonly: false
+    )
+
+    UI.user_error!("Expected Xcode project at #{XCODEPROJ}") unless Dir.exist?(XCODEPROJ)
+
+    # Auto-increment the build number: highest build already on TestFlight + 1.
+    # initial_build_number: 0 handles the virgin app record (no builds yet) -> 1.
+    # The query is unscoped (no version:) so it is always monotonic.
+    next_build = latest_testflight_build_number(
+      api_key: api_key,
+      app_identifier: APP_IDENTIFIER,
+      initial_build_number: 0
+    ) + 1
+    UI.message("Auto-incremented build number: #{next_build}")
+    increment_build_number_in_xcodeproj(
+      build_number: next_build.to_s,
+      xcodeproj: XCODEPROJ,
+      target: SCHEME
+    )
+
+    profile_name = lane_context[SharedValues::SIGH_NAME] ||
+                   ENV["sigh_#{APP_IDENTIFIER}_appstore_profile-name"]
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: XCODEPROJ,
+      team_id: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+      code_sign_identity: "Apple Distribution",
+      bundle_identifier: APP_IDENTIFIER,
+      profile_name: profile_name
+    )
+
+    build_app(
+      project: XCODEPROJ,
+      scheme: SCHEME,
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: File.expand_path("../build/ios", __dir__),
+      export_options: {
+        provisioningProfiles: { APP_IDENTIFIER => profile_name },
+        signingStyle: "manual"
+      }
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true,
+      distribute_external: false
+    )
+  end
+
+  desc "Prepare the App Store listing: push metadata + screenshots (does NOT submit)"
+  # Uploads the App Store text (store-assets/metadata/ios/) and the iPhone
+  # screenshots to the APP_VERSION App Store version, WITHOUT submitting for review
+  # and WITHOUT uploading a binary (the build is already on TestFlight via the beta
+  # lane). Review the result in App Store Connect, then run the submit lane.
+  lane :release do
+    api_key = asc_api_key
+
+    # Screenshots live canonically under store-assets/screenshots/ios (shared with
+    # the release docs). deliver wants a <lang>/ tree and classifies each shot by
+    # its pixel size, so stage copies into a gitignored dir each run — the single
+    # source of truth stays in store-assets/.
+    src   = File.expand_path("../store-assets/screenshots/ios", __dir__)
+    root  = File.expand_path("screenshots", __dir__)
+    lang  = File.join(root, "en-US")
+    shots = Dir[File.join(src, "*.png")]
+    UI.user_error!("No screenshots in #{src} — capture them first") if shots.empty?
+    FileUtils.rm_rf(root)
+    FileUtils.mkdir_p(lang)
+    FileUtils.cp(shots, lang)
+
+    upload_to_app_store(
+      api_key: api_key,
+      app_identifier: APP_IDENTIFIER,
+      app_version: APP_VERSION,
+      metadata_path: File.expand_path("../store-assets/metadata/ios", __dir__),
+      screenshots_path: root,
+      skip_binary_upload: true,        # build already on TestFlight (beta lane)
+      overwrite_screenshots: true,
+      submit_for_review: false,        # PREPARE ONLY — submit via the submit lane
+      automatic_release: false,
+      precheck_include_in_app_purchases: false,
+      run_precheck_before_submit: false,
+      force: true                      # non-interactive: skip the HTML preview
+    )
+  end
+
+  desc "Submit the APP_VERSION App Store version for review (attaches the latest build)"
+  # Assumes the listing is already uploaded (release lane), the age rating and
+  # content-rights declaration are set, Pricing is set to Free, and App Privacy is
+  # PUBLISHED in the App Store Connect web UI — Apple rejects the submission
+  # otherwise. deliver selects the latest build for the version and submits. This
+  # is the actual public submission to Apple review.
+  lane :submit do
+    api_key = asc_api_key
+    upload_to_app_store(
+      api_key: api_key,
+      app_identifier: APP_IDENTIFIER,
+      app_version: APP_VERSION,
+      skip_binary_upload: true,
+      skip_metadata: true,
+      skip_screenshots: true,
+      submit_for_review: true,
+      automatic_release: false,
+      precheck_include_in_app_purchases: false,
+      run_precheck_before_submit: false,
+      submission_information: {
+        export_compliance_uses_encryption: false,
+        add_id_info_uses_idfa: false
+      },
+      force: true
+    )
+  end
+end
+
+# ---------------------------------------------------------------------------
+# Android / Google Play
+# ---------------------------------------------------------------------------
 
 PACKAGE_NAME  = "cx.viz.balisurf"
 AAB_PATH      = File.expand_path("../composeApp/build/outputs/bundle/release/composeApp-release.aab", __dir__)
