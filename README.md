@@ -54,6 +54,19 @@ Requires JDK 21 + Android SDK (compileSdk 37). No build environment is bundled.
 ./gradlew :composeApp:assembleDebug   # unsigned debug APK
 ```
 
+### Install on your Android phone (no Play account needed)
+
+Every green CI run publishes a sideloadable debug APK:
+
+1. Open the repo's **Actions → CI** → the latest green run.
+2. Download the **`balisurf-debug-apk`** artifact (a zip) and unzip it.
+3. Copy `composeApp-debug.apk` to your phone and tap it to install (allow
+   "install from unknown sources" for your file manager / browser once).
+
+This is a debug build — unsigned for Play, but perfect for field-testing the
+verdicts against real surf. The Play release pipeline (`docs/release-android.md`)
+is for public distribution.
+
 iOS: open `iosApp` in Xcode once the Xcode project is added (not in v0.1 scaffold).
 
 ## Data attribution
