@@ -1,0 +1,1 @@
+Free surf forecast app. No account or login required, no purchases. Forecast data is fetched live from the free Open-Meteo API; session logs stay on device. No demo credentials needed.
