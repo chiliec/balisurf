@@ -1,1 +1,0 @@
-Free surf forecast app, no login, no purchases. Data comes live from the free Open-Meteo API.
