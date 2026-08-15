@@ -1,0 +1,29 @@
+.gradle/
+build/
+*.iml
+.idea/
+local.properties
+.kotlin/
+xcuserdata/
+.DS_Store
+
+# Release signing — never commit the keystore or its passwords
+keystore.properties
+*.jks
+*.keystore
+
+# Built distributables
+dist/
+*.apk
+*.aab
+
+# Google Play service account key — never commit
+play-service-account.json
+
+# iOS release tooling
+Gemfile.lock
+vendor/
+fastlane/.env
+fastlane/report.xml
+fastlane/play-metadata/
+build/ios/
