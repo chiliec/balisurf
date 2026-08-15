@@ -1,0 +1,126 @@
+name: Android Play
+
+# Build the signed AAB and upload it to the Play internal-testing track.
+# Manual dispatch, or push a version tag (e.g. v1.0.0). The upload step only runs
+# when the Play + signing secrets are configured; without them the job still
+# builds and uploads the AAB as a workflow artifact so the pipeline is verifiable
+# before the Play account exists.
+on:
+  workflow_dispatch:
+    inputs:
+      track:
+        description: "Play track to upload to (leave 'none' to only build the AAB artifact)"
+        type: choice
+        options: [none, internal, closed]
+        default: none
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: android-play-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  play:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      # compileSdk is 37, newer than the platform preinstalled on ubuntu-latest,
+      # so install it explicitly. The package is "android-37.0" (minor version).
+      - name: Install Android SDK platform 37
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.0"
+
+      - name: Set up Ruby + bundler cache
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      # Materialize the upload keystore + keystore.properties from secrets so the
+      # release build is signed. Absent the secret the build still runs (unsigned)
+      # and only the artifact path is useful.
+      - name: Configure signing
+        id: signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ANDROID_KEYSTORE_BASE64:-}" ]; then
+            echo "No ANDROID_KEYSTORE_BASE64 secret — building UNSIGNED (artifact only)."
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Keep the .jks out of the checkout. keystore.properties itself has to
+          # sit at the repo root — composeApp/build.gradle.kts reads
+          # rootProject.file("keystore.properties") — but rootProject.file()
+          # passes an absolute storeFile through unchanged.
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/balisurf-upload.jks"
+          # printf, not a heredoc: an unquoted heredoc runs command substitution
+          # on the password and swallows backslashes.
+          printf '%s\n' \
+            "storeFile=$RUNNER_TEMP/balisurf-upload.jks" \
+            "storePassword=$ANDROID_KEYSTORE_PASSWORD" \
+            "keyAlias=$ANDROID_KEY_ALIAS" \
+            "keyPassword=$ANDROID_KEY_PASSWORD" > keystore.properties
+          echo "signed=true" >> "$GITHUB_OUTPUT"
+
+      # One build, not two: play_internal builds the AAB itself (with the
+      # versionCode it resolves from Play), so invoking `bundle` as well would
+      # rebuild and leave the artifact holding a different binary than the one
+      # shipped. Pick the lane instead. PLAY_JSON_KEY has to be probed in the
+      # shell — the `secrets` context is not available in a step-level `if:`.
+      - name: Build AAB (upload to Play when configured)
+        env:
+          PLAY_JSON_KEY: ${{ secrets.PLAY_JSON_KEY }}
+          PLAY_REQUESTED: >-
+            ${{ steps.signing.outputs.signed == 'true' &&
+            (github.event_name == 'push' || github.event.inputs.track == 'internal'
+            || github.event.inputs.track == 'closed') }}
+          # A tag push keeps shipping to internal; closed is dispatch-only.
+          PLAY_TRACK: ${{ github.event_name == 'push' && 'internal' || github.event.inputs.track }}
+          ANDROID_VERSION_CODE: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          if [ "$PLAY_REQUESTED" = "true" ] && [ -n "${PLAY_JSON_KEY:-}" ]; then
+            # The upload lanes derive the versionCode from Play; don't pin it here.
+            unset ANDROID_VERSION_CODE
+            if [ "$PLAY_TRACK" = "closed" ]; then
+              bundle exec fastlane android play_closed
+            else
+              bundle exec fastlane android play_internal
+            fi
+          else
+            echo "Artifact-only build (unsigned and/or no Play credentials)."
+            bundle exec fastlane android bundle
+          fi
+
+      - name: Upload AAB artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: balisurf-aab
+          path: composeApp/build/outputs/bundle/release/composeApp-release.aab
+          retention-days: 14
+          if-no-files-found: warn
+
+      # Runners are ephemeral, but don't leave the upload key lying around mid-job.
+      - name: Clean up signing material
+        if: always()
+        run: rm -f keystore.properties "$RUNNER_TEMP/balisurf-upload.jks"

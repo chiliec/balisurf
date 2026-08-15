@@ -1,0 +1,13 @@
+BaliSurf gives you a straight answer for Bali's Bukit peninsula: is it worth paddling out, and when?
+
+It does not try to out-forecast the big weather models. It pulls the same swell, wind and tide data everyone has — for free — and adds the thing generic apps lack: per-spot local judgement. Each spot has hand-tuned rules for the tide, swell direction, period and wind it actually needs, and the app turns the live forecast into a plain star rating, a one-line call, and the best window today.
+
+Features:
+• Five Bukit spots: Uluwatu, Padang Padang, Bingin, Impossibles, Dreamland.
+• Star rating + plain-language verdict per spot ("Firing", "Fun", "Wrong tide").
+• 24-hour timeline showing the best window to go.
+• High and low tide times, free — many Bukit reefs only work on a specific tide.
+• Reef bathymetry maps derived from free satellite imagery, so you can see the bottom.
+• Log whether a spot worked — your reports sharpen the forecast for everyone.
+
+Free data from Open-Meteo (CC BY 4.0). Early access — spot rules are still being tuned with local surfers, and your session logs are how they get better.

@@ -1,0 +1,4 @@
+# No plugins needed for the Android-only pipeline. The versioning plugin is only
+# required for the iOS increment_build_number_in_xcodeproj lane, which BaliSurf
+# does not have yet. Left as a placeholder so `bundle` doesn't error on a missing
+# Pluginfile referenced by the Gemfile.

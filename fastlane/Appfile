@@ -1,0 +1,4 @@
+app_identifier("cx.viz.balisurf")
+
+# No apple_id / itc login. iOS release is not wired yet (no Xcode project in the
+# repo); when it is, add team_id here and port slovo's ios platform block.
