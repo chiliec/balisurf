@@ -20,7 +20,8 @@ dist/
 # Google Play service account key — never commit
 play-service-account.json
 
-# iOS release tooling
+# iOS release tooling — the ASC API key must never be committed
+AuthKey_*.p8
 Gemfile.lock
 vendor/
 fastlane/.env
