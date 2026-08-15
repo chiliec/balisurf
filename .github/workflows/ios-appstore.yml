@@ -1,0 +1,40 @@
+name: iOS App Store
+
+# Listing/metadata pushes and the review submission. Both are pure App Store
+# Connect API calls (deliver) — no build, no Xcode, so a Linux runner is fine.
+#   lane=release  push metadata + screenshots to the APP_VERSION version (no submit)
+#   lane=submit   submit APP_VERSION for review, attaching the latest TestFlight build
+on:
+  workflow_dispatch:
+    inputs:
+      lane:
+        description: 'fastlane ios lane'
+        type: choice
+        required: true
+        default: release
+        options: [release, submit]
+
+permissions:
+  contents: read
+
+jobs:
+  deliver:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Ruby + bundler cache
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: fastlane ios ${{ inputs.lane }}
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          FASTLANE_DISABLE_COLORS: '1'
+          LANE: ${{ inputs.lane }}
+        run: bundle exec fastlane ios "$LANE"
