@@ -27,3 +27,7 @@ fastlane/.env
 fastlane/report.xml
 fastlane/play-metadata/
 build/ios/
+
+# Python
+__pycache__/
+*.pyc
