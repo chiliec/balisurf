@@ -48,6 +48,41 @@ Run live on two hero spots (scene `S2A_50LKR_20260607`, 0.09% cloud):
 
 Both show real reef structure, not speckle.
 
+## Multi-scene composite (`composite.py`)
+
+Median-stacks N low-cloud scenes' pSDB (each robustly normalized, then per-pixel
+`nanmedian` with a `--min-obs` floor) to suppress noise and fill glint/foam gaps.
+
+**HONEST RESULT — a composite does NOT always beat a single scene.** Measured on
+Uluwatu against GEBCO:
+- best single scene (0.09% cloud): **corr 0.856**
+- 10-scene composite (post-2022, <10% cloud): **corr 0.745**, and no smoother.
+
+Why: when one near-perfect low-cloud scene exists, mixing in hazier scenes at
+different tide stages / sun angles *dilutes* the best data and smears the shallow
+reef edge (each scene images the reef at a different water level). Median stacking
+wins when EVERY scene is mediocre — it averages out clouds/glint — not when you
+already hold a flawless one.
+
+**When to use which:**
+- **Default: single best scene** (`sdb_pipeline.py`) — use its raster for
+  `calibrate.py`. Better wherever a clean (<1% cloud) scene is available (most of
+  Bali's dry season).
+- **Composite fallback** (`composite.py`) — for spots/regions with NO clean single
+  scene (persistently cloudy areas, e.g. wetter parts of Indonesia), where
+  stacking many so-so scenes beats any one of them.
+
+Two real pitfalls it handles:
+- `--from-date 2022-06-01` default: Sentinel-2's Jan-2022 processing baseline added
+  a −1000 radiometric offset; mixing pre/post-2022 scenes corrupts the stack.
+- per-scene robust normalization (median/IQR) before stacking, so different
+  sun/tide/atmosphere offsets don't add variance.
+
+```bash
+python composite.py --lat -8.8153 --lon 115.0886 --name uluwatu \
+    --scenes 10 --min-obs 3            # writes out/<name>_psdb_composite.tif/.png
+```
+
 ## Honest limitations (what "relative" means)
 
 - **Calibration to metres — DONE (bootstrap) via `calibrate.py`.** It fits
