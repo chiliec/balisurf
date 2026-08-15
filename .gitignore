@@ -26,6 +26,8 @@ Gemfile.lock
 vendor/
 fastlane/.env
 fastlane/report.xml
+fastlane/README.md
+fastlane/screenshots/
 fastlane/play-metadata/
 build/ios/
 

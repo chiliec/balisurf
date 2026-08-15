@@ -1,0 +1,1 @@
+surf,forecast,tide,swell,uluwatu,canggu,lombok,waves,reef,padang,bingin,wind,report,chart

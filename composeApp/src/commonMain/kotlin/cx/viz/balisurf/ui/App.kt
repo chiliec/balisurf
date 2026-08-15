@@ -67,7 +67,7 @@ fun App(module: AppModule) = MaterialTheme {
             // region could sort later; for now keep the curated order.
             val grouped = data.groupBy { it.spot.region }
             LazyColumn(
-                Modifier.fillMaxSize(),
+                Modifier.fillMaxSize().padding(padding),
                 contentPadding = PaddingValues(12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
