@@ -1,5 +1,6 @@
 package cx.viz.balisurf.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,20 +26,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 /**
- * MVP UI: one list screen. Each row is a spot + its star verdict + one-line call
- * and best window. Deliberately minimal — the product value is the verdict text,
- * not chrome. Detail screen / timeline come after the thesis is validated.
+ * MVP UI: a list screen of the 5 Bukit spots; tapping one opens a detail screen
+ * with the 24h timeline, tides, and reef notes. The product value is the verdict
+ * text + timeline, not chrome. Single-level nav via selection state — no nav lib
+ * needed for one level.
  */
 @Composable
 fun App(module: AppModule) = MaterialTheme {
     var state by remember { mutableStateOf<List<SpotForecast>?>(null) }
+    var selectedId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         state = module.loadAll()
     }
 
+    val data = state
+    val selected = data?.firstOrNull { it.spot.id == selectedId }
+
+    if (selected != null) {
+        SpotDetailScreen(selected, onBack = { selectedId = null })
+        return@MaterialTheme
+    }
+
     Scaffold { padding ->
-        val data = state
         if (data == null) {
             Column(
                 Modifier.fillMaxSize().padding(padding),
@@ -61,7 +71,7 @@ fun App(module: AppModule) = MaterialTheme {
                         modifier = Modifier.padding(vertical = 8.dp),
                     )
                 }
-                items(data) { sf -> SpotCard(sf) }
+                items(data) { sf -> SpotCard(sf, onClick = { selectedId = sf.spot.id }) }
                 item {
                     Text(
                         "Forecast data © Open-Meteo (CC BY 4.0). Tides are relative bands, not chart datum.",
@@ -75,8 +85,8 @@ fun App(module: AppModule) = MaterialTheme {
 }
 
 @Composable
-private fun SpotCard(sf: SpotForecast) {
-    Card(Modifier.fillMaxWidth()) {
+private fun SpotCard(sf: SpotForecast, onClick: () -> Unit) {
+    Card(Modifier.fillMaxWidth().clickable(onClick = onClick)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             val stars = sf.verdict?.stars ?: 0
             Text(
@@ -103,5 +113,5 @@ private fun SpotCard(sf: SpotForecast) {
     }
 }
 
-/** "2026-08-15T07:00" -> "07:00". */
-private fun hhmm(iso: String): String = iso.substringAfter('T').take(5)
+/** "2026-08-15T07:00" -> "07:00". Shared with the detail screen. */
+internal fun hhmm(iso: String): String = iso.substringAfter('T').take(5)

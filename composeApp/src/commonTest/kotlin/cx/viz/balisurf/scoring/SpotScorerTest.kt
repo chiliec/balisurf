@@ -105,4 +105,22 @@ class SpotScorerTest {
         // 350° to 10° is 20°, not 340°.
         assertEquals(20.0, SpotScorer.angularDelta(350.0, 10.0), 1e-9)
     }
+
+    @Test
+    fun water_over_reef_factor_is_one_without_depth() {
+        // Ulu rules have no reefCrestDepthM -> multiplier must be 1.0 (behaviour unchanged).
+        val c = goodSwell(TideState.HIGH)
+        assertEquals(1.0, SpotScorer.waterOverReefFactor(ulu.rules, c), 1e-9)
+    }
+
+    @Test
+    fun water_over_reef_rewards_ideal_band_and_penalises_extremes() {
+        val rules = ulu.rules.copy(reefCrestDepthM = 0.5, idealWaterMinM = 0.5, idealWaterMaxM = 2.5)
+        val ideal = goodSwell(TideState.HIGH).copy(tideHeightMeters = 1.0)   // water 1.5m
+        val tooDeep = goodSwell(TideState.HIGH).copy(tideHeightMeters = 4.0) // water 4.5m
+        val dry = goodSwell(TideState.HIGH).copy(tideHeightMeters = -0.8)    // water -0.3m
+        assertEquals(1.0, SpotScorer.waterOverReefFactor(rules, ideal), 1e-9)
+        assertTrue(SpotScorer.waterOverReefFactor(rules, tooDeep) < 1.0)
+        assertEquals(0.6, SpotScorer.waterOverReefFactor(rules, dry), 1e-9)
+    }
 }

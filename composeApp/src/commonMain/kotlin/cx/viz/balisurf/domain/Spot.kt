@@ -34,6 +34,18 @@ data class SpotRules(
     val offshoreWindMax: Int,
     /** Above this wind speed (km/h) the spot gets blown out regardless of direction. */
     val maxWindSpeedKmh: Double,
+    /**
+     * Optional: reef-crest depth below mean sea level (metres) from the SDB
+     * bathymetry. When present, the scorer estimates actual water-over-reef at the
+     * current tide (crest depth + tide height) and rewards the spot's ideal
+     * breaking window instead of relying only on the coarse LOW/MID/HIGH gate.
+     * Null = fall back to the tide-state gate alone. This is the SDB moat feeding
+     * the forecast; refine per-spot as real bathymetry improves.
+     */
+    val reefCrestDepthM: Double? = null,
+    /** Ideal water-over-reef band (metres) for a clean break, if reefCrestDepthM set. */
+    val idealWaterMinM: Double = 0.5,
+    val idealWaterMaxM: Double = 2.5,
 )
 
 enum class TideState { LOW, MID, HIGH }

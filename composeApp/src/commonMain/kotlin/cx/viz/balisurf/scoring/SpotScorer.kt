@@ -58,8 +58,37 @@ object SpotScorer {
         val windScore = 0.5 * offshore + 0.5 * calmness
 
         // Weighted blend. Direction + period carry the swell quality; wind gates cleanliness.
-        return (0.35 * dirScore + 0.30 * periodScore + 0.35 * windScore)
+        val base = (0.35 * dirScore + 0.30 * periodScore + 0.35 * windScore)
             .coerceIn(0.0, 1.0)
+
+        // SDB refinement: if we know the reef-crest depth, estimate actual
+        // water-over-reef at this hour's tide and modulate the score by how close
+        // it is to the spot's ideal breaking band. This turns the coarse
+        // LOW/MID/HIGH gate into a continuous, bathymetry-aware signal. When no
+        // depth is known (reefCrestDepthM == null) the multiplier is 1.0 and
+        // behaviour is unchanged.
+        return base * waterOverReefFactor(r, c)
+    }
+
+    /**
+     * Multiplier in [0.6, 1.0] from water-over-reef vs the spot's ideal band.
+     * water = crest depth (below MSL) + tide height (relative to MSL). Inside the
+     * ideal band -> 1.0; outside -> tapers, but never fully zeroes (the tide-state
+     * gate already handled the hard cases). Returns 1.0 if no crest depth known.
+     */
+    internal fun waterOverReefFactor(r: SpotRules, c: Conditions): Double {
+        val crest = r.reefCrestDepthM ?: return 1.0
+        val water = crest + c.tideHeightMeters
+        return when {
+            water < 0.0 -> 0.6                       // reef dry / barely covered
+            water in r.idealWaterMinM..r.idealWaterMaxM -> 1.0
+            water < r.idealWaterMinM ->
+                (0.6 + 0.4 * (water / r.idealWaterMinM)).coerceIn(0.6, 1.0)
+            else -> {                                // too deep = fat/soft
+                val over = water - r.idealWaterMaxM
+                (1.0 - 0.4 * min(1.0, over / 2.0)).coerceIn(0.6, 1.0)
+            }
+        }
     }
 
     /** Produce the full verdict for a spot across a day's hourly series. */
