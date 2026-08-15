@@ -1,6 +1,7 @@
 package cx.viz.balisurf.ui
 
 import cx.viz.balisurf.data.ForecastSource
+import cx.viz.balisurf.data.SessionLogStore
 import cx.viz.balisurf.data.SpotCatalog
 import cx.viz.balisurf.domain.Conditions
 import cx.viz.balisurf.domain.Spot
@@ -12,6 +13,7 @@ import cx.viz.balisurf.scoring.SpotScorer
 /** Composition root: the app's dependencies, mirroring the sibling apps' AppModule. */
 class AppModule(
     val forecast: ForecastSource,
+    val logs: SessionLogStore,
 )
 
 /**

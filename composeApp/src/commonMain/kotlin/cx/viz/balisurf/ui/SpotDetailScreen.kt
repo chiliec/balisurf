@@ -12,19 +12,28 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import cx.viz.balisurf.data.SessionLogStore
 import cx.viz.balisurf.domain.Conditions
 import cx.viz.balisurf.scoring.SpotScorer
+import kotlinx.datetime.Clock
 import balisurf.composeapp.generated.resources.Res
 import balisurf.composeapp.generated.resources.reef_bingin
 import balisurf.composeapp.generated.resources.reef_dreamland
@@ -36,11 +45,11 @@ import org.jetbrains.compose.resources.painterResource
 
 /**
  * Spot detail screen: the full read on one break — verdict, a 24h star timeline,
- * tide turning points, and the reef notes. Reuses the pure SpotScorer to score
- * each hour, so the timeline is exactly consistent with the list verdict.
+ * tide turning points, reef notes, and the session-log widget (the crowdsource
+ * loop). Reuses the pure SpotScorer so the timeline matches the list verdict.
  */
 @Composable
-fun SpotDetailScreen(sf: SpotForecast, onBack: () -> Unit) {
+fun SpotDetailScreen(sf: SpotForecast, logs: SessionLogStore, onBack: () -> Unit) {
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -58,6 +67,8 @@ fun SpotDetailScreen(sf: SpotForecast, onBack: () -> Unit) {
             style = MaterialTheme.typography.titleLarge,
         )
         Text(sf.verdict?.headline ?: "No forecast available")
+
+        SessionLogCard(sf, logs)
 
         if (sf.hours.isNotEmpty()) {
             Card(Modifier.fillMaxWidth()) {
@@ -151,6 +162,46 @@ private fun TimelineChart(sf: SpotForecast) {
             sf.hours.getOrNull(idx)?.let {
                 Text(hhmm(it.timeIso), style = MaterialTheme.typography.labelSmall)
             }
+        }
+    }
+}
+
+/**
+ * The crowdsource loop: let the user report whether the spot worked, capturing
+ * the current conditions snapshot. Logs are on-device (SessionLogStore) and are
+ * the ground-truth pipeline for calibrating spot rules / reef depth. Local count
+ * shown; export happens via the store's CSV (surfaced app-wide, see AppModule).
+ */
+@Composable
+private fun SessionLogCard(sf: SpotForecast, logs: SessionLogStore) {
+    var count by remember(sf.spot.id) { mutableStateOf(logs.countForSpot(sf.spot.id)) }
+    var justLogged by remember(sf.spot.id) { mutableStateOf<Boolean?>(null) }
+
+    // Snapshot to attach: the peak-scoring hour = a representative "now" for MVP.
+    val snapshot: Conditions? = sf.hours.maxByOrNull { SpotScorer.scoreHour(sf.spot, it) }
+
+    fun log(worked: Boolean) {
+        val ts = Clock.System.now().toString().take(16)  // yyyy-MM-ddTHH:mm
+        count = logs.logSession(sf.spot.id, worked, ts, conditions = snapshot)
+        justLogged = worked
+    }
+
+    Card(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Did it work?", fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Button(
+                    onClick = { log(true) },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
+                ) { Text("👍 Worked") }
+                OutlinedButton(onClick = { log(false) }) { Text("👎 Didn't") }
+            }
+            val msg = when (justLogged) {
+                true -> "Logged — thanks. Your reports calibrate this spot."
+                false -> "Logged. Even a 'no' sharpens the forecast."
+                null -> "$count report${if (count == 1) "" else "s"} for ${sf.spot.name} so far."
+            }
+            Text(msg, style = MaterialTheme.typography.bodySmall)
         }
     }
 }

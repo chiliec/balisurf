@@ -44,7 +44,11 @@ fun App(module: AppModule) = MaterialTheme {
     val selected = data?.firstOrNull { it.spot.id == selectedId }
 
     if (selected != null) {
-        SpotDetailScreen(selected, onBack = { selectedId = null })
+        SpotDetailScreen(
+            sf = selected,
+            logs = module.logs,
+            onBack = { selectedId = null },
+        )
         return@MaterialTheme
     }
 
