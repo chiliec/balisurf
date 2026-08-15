@@ -65,7 +65,10 @@ commercial licence is required before monetizing (see `docs/ECONOMICS.md`).
 ## Roadmap (post-v0.1)
 
 1. Spot detail screen + 24h timeline with the best-window highlighted.
-2. Precise high/low tide **times** via a harmonic API (WorldTides, ~$5/mo).
+2. Precise high/low tide **times** — DONE, and **free**: `TideEvents` derives them
+   from the same Open-Meteo `sea_level_height_msl` series by extrema detection +
+   parabolic interpolation (sub-hour precision). No paid tide API needed. A paid
+   harmonic source (WorldTides) stays an optional future accuracy upgrade only.
 3. **Bathymetry**: DIY Satellite-Derived Bathymetry (Sentinel-2, free) for hero
    spots — the defensible moat. Then crowdsourced session logs.
 4. Shared caching backend once past ~500 users; Play/App Store release

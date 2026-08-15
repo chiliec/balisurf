@@ -91,6 +91,14 @@ private fun SpotCard(sf: SpotForecast) {
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
+            if (sf.tides.isNotEmpty()) {
+                Text(
+                    "Tides: " + sf.tides.joinToString("  ") {
+                        "${if (it.kind.name == "HIGH") "▲" else "▼"} ${hhmm(it.timeIso)}"
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
         }
     }
 }
