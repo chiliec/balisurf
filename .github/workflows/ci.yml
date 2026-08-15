@@ -29,6 +29,15 @@ jobs:
       - name: Assemble debug APK (smoke, unsigned)
         run: ./gradlew :composeApp:assembleDebug --stacktrace
 
+      - name: Upload debug APK (sideloadable for field testing)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: balisurf-debug-apk
+          path: composeApp/build/outputs/apk/debug/composeApp-debug.apk
+          retention-days: 14
+          if-no-files-found: warn
+
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
