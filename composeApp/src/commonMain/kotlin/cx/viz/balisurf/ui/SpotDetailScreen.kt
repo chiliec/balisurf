@@ -35,10 +35,17 @@ import cx.viz.balisurf.domain.Conditions
 import cx.viz.balisurf.platform.nowIso
 import cx.viz.balisurf.scoring.SpotScorer
 import balisurf.composeapp.generated.resources.Res
+import balisurf.composeapp.generated.resources.reef_balangan
+import balisurf.composeapp.generated.resources.reef_batubolong
 import balisurf.composeapp.generated.resources.reef_bingin
+import balisurf.composeapp.generated.resources.reef_desertpoint
 import balisurf.composeapp.generated.resources.reef_dreamland
+import balisurf.composeapp.generated.resources.reef_greenbowl
 import balisurf.composeapp.generated.resources.reef_impossibles
+import balisurf.composeapp.generated.resources.reef_nusadua
+import balisurf.composeapp.generated.resources.reef_nyangnyang
 import balisurf.composeapp.generated.resources.reef_padang
+import balisurf.composeapp.generated.resources.reef_shipwrecks
 import balisurf.composeapp.generated.resources.reef_uluwatu
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -214,13 +221,22 @@ private fun barColor(score: Double): Color = when (SpotScorer.toStars(score)) {
     else -> Color(0xFF2E7D32)
 }
 
-/** Map a spot id to its bundled reef-bathymetry drawable, or null if none. */
+/** Map a spot id to its bundled reef-bathymetry drawable, or null if none. Only
+ * spots whose SDB produced a coherent map are included; the rest (boat-access,
+ * deep-water, or cloud-contaminated AOIs) show no reef card. */
 private fun reefDrawable(spotId: String): DrawableResource? = when (spotId) {
     "uluwatu" -> Res.drawable.reef_uluwatu
     "padang" -> Res.drawable.reef_padang
     "bingin" -> Res.drawable.reef_bingin
     "impossibles" -> Res.drawable.reef_impossibles
     "dreamland" -> Res.drawable.reef_dreamland
+    "balangan" -> Res.drawable.reef_balangan
+    "greenbowl" -> Res.drawable.reef_greenbowl
+    "batubolong" -> Res.drawable.reef_batubolong
+    "nusadua" -> Res.drawable.reef_nusadua
+    "desertpoint" -> Res.drawable.reef_desertpoint
+    "nyangnyang" -> Res.drawable.reef_nyangnyang
+    "shipwrecks" -> Res.drawable.reef_shipwrecks
     else -> null
 }
 
