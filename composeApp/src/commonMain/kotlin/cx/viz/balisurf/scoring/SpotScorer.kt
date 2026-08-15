@@ -3,6 +3,7 @@ package cx.viz.balisurf.scoring
 import cx.viz.balisurf.domain.Conditions
 import cx.viz.balisurf.domain.Factor
 import cx.viz.balisurf.domain.Spot
+import cx.viz.balisurf.domain.SpotRules
 import cx.viz.balisurf.domain.TimeWindow
 import cx.viz.balisurf.domain.Verdict
 import kotlin.math.abs

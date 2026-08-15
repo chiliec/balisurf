@@ -25,12 +25,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cx.viz.balisurf.domain.Conditions
 import cx.viz.balisurf.scoring.SpotScorer
-import cx.viz.balisurf.generated.resources.Res
-import cx.viz.balisurf.generated.resources.reef_bingin
-import cx.viz.balisurf.generated.resources.reef_dreamland
-import cx.viz.balisurf.generated.resources.reef_impossibles
-import cx.viz.balisurf.generated.resources.reef_padang
-import cx.viz.balisurf.generated.resources.reef_uluwatu
+import balisurf.composeapp.generated.resources.Res
+import balisurf.composeapp.generated.resources.reef_bingin
+import balisurf.composeapp.generated.resources.reef_dreamland
+import balisurf.composeapp.generated.resources.reef_impossibles
+import balisurf.composeapp.generated.resources.reef_padang
+import balisurf.composeapp.generated.resources.reef_uluwatu
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
