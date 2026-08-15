@@ -17,6 +17,8 @@ data class Spot(
     val longitude: Double,
     val rules: SpotRules,
     val notes: String = "",
+    /** Region label for grouping the spot list (e.g. "Bukit", "Lombok"). */
+    val region: String = "Bali",
 )
 
 data class SpotRules(

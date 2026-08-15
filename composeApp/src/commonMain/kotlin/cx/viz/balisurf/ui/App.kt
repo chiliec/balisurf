@@ -63,6 +63,9 @@ fun App(module: AppModule) = MaterialTheme {
                 Text("Reading the ocean…", Modifier.padding(top = 12.dp))
             }
         } else {
+            // Group by region, preserving catalog order. Best spot's stars per
+            // region could sort later; for now keep the curated order.
+            val grouped = data.groupBy { it.spot.region }
             LazyColumn(
                 Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(12.dp),
@@ -70,12 +73,24 @@ fun App(module: AppModule) = MaterialTheme {
             ) {
                 item {
                     Text(
-                        "Bukit — today",
+                        "Bali surf — today",
                         style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier.padding(vertical = 8.dp),
                     )
                 }
-                items(data) { sf -> SpotCard(sf, onClick = { selectedId = sf.spot.id }) }
+                grouped.forEach { (region, spots) ->
+                    item(key = "hdr-$region") {
+                        Text(
+                            region,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = 12.dp, bottom = 2.dp),
+                        )
+                    }
+                    items(spots, key = { it.spot.id }) { sf ->
+                        SpotCard(sf, onClick = { selectedId = sf.spot.id })
+                    }
+                }
                 item {
                     Text(
                         "Forecast data © Open-Meteo (CC BY 4.0). Tides are relative bands, not chart datum.",

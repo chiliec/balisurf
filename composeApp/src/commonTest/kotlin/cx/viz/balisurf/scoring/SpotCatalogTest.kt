@@ -75,6 +75,26 @@ class SpotCatalogTest {
     }
 
     @Test
+    fun every_spot_has_a_region() {
+        SpotCatalog.spots.forEach { s ->
+            assertTrue(s.region.isNotBlank(), "${s.id} has no region")
+        }
+    }
+
+    @Test
+    fun grouping_by_region_yields_each_region_once() {
+        // The list UI does data.groupBy { region }. groupBy collects all spots of
+        // a region together regardless of catalog position, so every region gets
+        // exactly one header. Guard that the region set is what the UI expects.
+        val grouped = SpotCatalog.spots.groupBy { it.region }
+        assertTrue(grouped.keys.containsAll(
+            listOf("Bukit", "West Coast", "East Coast", "Nusa Lembongan", "Lombok")
+        ), "missing an expected region group: ${grouped.keys}")
+        // Every spot lands in exactly one group.
+        assertEquals(SpotCatalog.spots.size, grouped.values.sumOf { it.size })
+    }
+
+    @Test
     fun wraparound_offshore_windows_are_north_crossing() {
         // Gerupuk/Mawi use an offshore window that crosses north (min > max, e.g.
         // 315..45). The scorer's circular windowScore handles this; this guards

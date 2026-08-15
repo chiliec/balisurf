@@ -28,6 +28,7 @@ object SpotCatalog {
         Spot(
             id = "uluwatu",
             name = "Uluwatu",
+            region = "Bukit",
             latitude = -8.8153, longitude = 115.0886,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.MID, TideState.HIGH),
@@ -42,6 +43,7 @@ object SpotCatalog {
         Spot(
             id = "padang",
             name = "Padang Padang",
+            region = "Bukit",
             latitude = -8.8107, longitude = 115.1035,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.MID, TideState.HIGH),
@@ -56,6 +58,7 @@ object SpotCatalog {
         Spot(
             id = "bingin",
             name = "Bingin",
+            region = "Bukit",
             latitude = -8.8060, longitude = 115.1120,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.LOW, TideState.MID),
@@ -70,6 +73,7 @@ object SpotCatalog {
         Spot(
             id = "impossibles",
             name = "Impossibles",
+            region = "Bukit",
             latitude = -8.8020, longitude = 115.1180,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.LOW, TideState.MID),
@@ -84,6 +88,7 @@ object SpotCatalog {
         Spot(
             id = "dreamland",
             name = "Dreamland",
+            region = "Bukit",
             latitude = -8.7970, longitude = 115.1130,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.LOW, TideState.MID, TideState.HIGH),
@@ -98,6 +103,7 @@ object SpotCatalog {
         Spot(
             id = "balangan",
             name = "Balangan",
+            region = "Bukit",
             latitude = -8.7918, longitude = 115.1218,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.LOW, TideState.MID),
@@ -112,6 +118,7 @@ object SpotCatalog {
         Spot(
             id = "greenbowl",
             name = "Green Bowl",
+            region = "Bukit",
             latitude = -8.8475, longitude = 115.1685,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.LOW, TideState.MID),
@@ -128,6 +135,7 @@ object SpotCatalog {
         Spot(
             id = "canggu",
             name = "Canggu (Echo Beach)",
+            region = "West Coast",
             latitude = -8.6510, longitude = 115.1310,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.LOW, TideState.MID),
@@ -142,6 +150,7 @@ object SpotCatalog {
         Spot(
             id = "batubolong",
             name = "Batu Bolong (Old Man's)",
+            region = "West Coast",
             latitude = -8.6580, longitude = 115.1280,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.MID, TideState.HIGH),
@@ -156,6 +165,7 @@ object SpotCatalog {
         Spot(
             id = "medewi",
             name = "Medewi",
+            region = "West Coast",
             latitude = -8.4265, longitude = 114.7930,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.MID, TideState.HIGH),
@@ -172,6 +182,7 @@ object SpotCatalog {
         Spot(
             id = "keramas",
             name = "Keramas",
+            region = "East Coast",
             latitude = -8.5965, longitude = 115.3280,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.MID, TideState.HIGH),
@@ -186,6 +197,7 @@ object SpotCatalog {
         Spot(
             id = "nusadua",
             name = "Nusa Dua",
+            region = "East Coast",
             latitude = -8.8010, longitude = 115.2320,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.MID, TideState.HIGH),
@@ -200,6 +212,7 @@ object SpotCatalog {
         Spot(
             id = "serangan",
             name = "Serangan (Sri Lanka)",
+            region = "East Coast",
             latitude = -8.7380, longitude = 115.2410,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.MID, TideState.HIGH),
@@ -216,6 +229,7 @@ object SpotCatalog {
         Spot(
             id = "nyangnyang",
             name = "Nyang Nyang",
+            region = "Bukit",
             latitude = -8.8360, longitude = 115.1010,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.MID, TideState.HIGH),
@@ -230,6 +244,7 @@ object SpotCatalog {
         Spot(
             id = "airportlefts",
             name = "Airport Lefts",
+            region = "Kuta",
             latitude = -8.7480, longitude = 115.1640,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.MID, TideState.HIGH),
@@ -246,6 +261,7 @@ object SpotCatalog {
         Spot(
             id = "shipwrecks",
             name = "Shipwrecks (Lembongan)",
+            region = "Nusa Lembongan",
             latitude = -8.6790, longitude = 115.4470,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.MID, TideState.HIGH),
@@ -260,6 +276,7 @@ object SpotCatalog {
         Spot(
             id = "playgrounds",
             name = "Playgrounds (Lembongan)",
+            region = "Nusa Lembongan",
             latitude = -8.6835, longitude = 115.4520,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.MID, TideState.HIGH),
@@ -276,6 +293,7 @@ object SpotCatalog {
         Spot(
             id = "desertpoint",
             name = "Desert Point (Lombok)",
+            region = "Lombok",
             latitude = -8.7620, longitude = 115.8180,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.LOW, TideState.MID),
@@ -290,6 +308,7 @@ object SpotCatalog {
         Spot(
             id = "gerupuk",
             name = "Gerupuk (Lombok)",
+            region = "Lombok",
             latitude = -8.9060, longitude = 116.3360,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.LOW, TideState.MID, TideState.HIGH),
@@ -304,6 +323,7 @@ object SpotCatalog {
         Spot(
             id = "mawi",
             name = "Mawi (Lombok)",
+            region = "Lombok",
             latitude = -8.8880, longitude = 116.2050,
             rules = SpotRules(
                 worksOnTide = setOf(TideState.LOW, TideState.MID),

@@ -42,6 +42,8 @@ import balisurf.composeapp.generated.resources.reef_desertpoint
 import balisurf.composeapp.generated.resources.reef_dreamland
 import balisurf.composeapp.generated.resources.reef_greenbowl
 import balisurf.composeapp.generated.resources.reef_impossibles
+import balisurf.composeapp.generated.resources.reef_keramas
+import balisurf.composeapp.generated.resources.reef_medewi
 import balisurf.composeapp.generated.resources.reef_nusadua
 import balisurf.composeapp.generated.resources.reef_nyangnyang
 import balisurf.composeapp.generated.resources.reef_padang
@@ -237,6 +239,8 @@ private fun reefDrawable(spotId: String): DrawableResource? = when (spotId) {
     "desertpoint" -> Res.drawable.reef_desertpoint
     "nyangnyang" -> Res.drawable.reef_nyangnyang
     "shipwrecks" -> Res.drawable.reef_shipwrecks
+    "keramas" -> Res.drawable.reef_keramas
+    "medewi" -> Res.drawable.reef_medewi
     else -> null
 }
 
