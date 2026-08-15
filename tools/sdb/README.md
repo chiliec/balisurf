@@ -50,16 +50,39 @@ Both show real reef structure, not speckle.
 
 ## Honest limitations (what "relative" means)
 
-- **Not metres yet.** `pSDB` is a depth *index*, not calibrated depth. To get
-  metres, fit `depth = m·pSDB + c` against a handful of known soundings
-  (nautical chart spot-depths, a dive computer, or a phone-depth log). That
-  calibration is the next step and turns this into an absolute product.
-- **Clear shallow water only** (~0–15 m). Deeper than that the signal saturates;
-  whitewater and heavy sunglint are masked but reduce coverage on big-surf days.
+- **Calibration to metres — DONE (bootstrap) via `calibrate.py`.** It fits
+  `depth = m·pSDB + c` against control points and writes a metre-depth GeoTIFF+PNG.
+  - Validated on Uluwatu against a GEBCO grid: **correlation 0.84, RMSE ~3.4 m**
+    over a 1–25 m range. The free satellite index genuinely tracks real depth.
+  - The metre map is physically plausible: a shallow reef band (0–3 m) along the
+    coast deepening to 20 m+ offshore, median ~10 m. See `out/uluwatu_depth_m.png`.
+  - **GEBCO is only a bootstrap** (coarse ~450 m; it can't see the reef itself).
+    It proves the model and gives a first metre map, but for a real product feed
+    real soundings via `--csv` (see `control_points.example.csv`): chart spot
+    depths, a dive-computer track, or crowdsourced phone-depth logs. Even 5–10
+    good points beat a GEBCO grid because they sit ON the reef.
+- **Clear shallow water only** (~0–15 m). Deeper than that the signal saturates
+  (visible as residual speckle in the deep zone of the maps); whitewater and
+  heavy sunglint are masked but reduce coverage on big-surf days.
 - **Single scene.** Averaging several low-tide, low-cloud, low-swell scenes would
   cut noise further and fill masked gaps — a straightforward enhancement.
-- Tide stage at image capture shifts the absolute datum; for *relative* reef
-  shape it barely matters, for calibrated metres you'd record the capture tide.
+- Tide stage at capture shifts the absolute datum; for *relative* reef shape it
+  barely matters, for calibrated metres record the capture tide (or calibrate
+  with same-datum soundings).
+
+## Calibrate to metres
+
+```bash
+# Bootstrap/demo (free, coarse — proves the model):
+python calibrate.py --psdb out/uluwatu_psdb.tif --name uluwatu --gebco 12
+
+# Production (real soundings — accurate on the reef):
+python calibrate.py --psdb out/uluwatu_psdb.tif --name uluwatu \
+    --csv control_points.example.csv
+```
+Outputs `out/<name>_depth_m.tif` (metres, georeferenced) + `out/<name>_depth_m.png`.
+Prints correlation / slope / RMSE and warns if correlation < 0.6 (SDB unreliable
+there — turbid, too deep, or glare).
 
 ## Roadmap into the app
 

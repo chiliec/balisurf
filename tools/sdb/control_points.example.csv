@@ -1,0 +1,12 @@
+# Sample control-points file for calibrate.py --csv
+# Real soundings turn the relative pSDB index into absolute metres.
+# depth_m is POSITIVE metres below the surface (chart datum or capture-tide level).
+# Sources: nautical-chart spot depths, a dive-computer track, a kayak/phone
+# depth-sounder pass, or crowdsourced session logs.
+# Replace these placeholder rows with real measurements before trusting the output.
+lat,lon,depth_m
+-8.8140,115.0870,1.5
+-8.8135,115.0862,3.0
+-8.8128,115.0855,6.0
+-8.8120,115.0848,10.0
+-8.8112,115.0840,15.0
