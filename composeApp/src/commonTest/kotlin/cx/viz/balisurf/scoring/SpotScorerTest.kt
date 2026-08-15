@@ -85,7 +85,7 @@ class SpotScorerTest {
     fun best_window_picks_the_clean_morning_run() {
         // 3 poor hours then 3 clean hours; window should land on the clean run.
         val poor = (5..7).map { goodSwell(TideState.HIGH).copy(timeIso = "2026-08-15T0$it:00", windSpeedKmh = 40.0, windDirectionDeg = 270) }
-        val clean = (8..10).map { goodSwell(TideState.HIGH).copy(timeIso = "2026-08-15T$it:00") }
+        val clean = (8..10).map { goodSwell(TideState.HIGH).copy(timeIso = "2026-08-15T${it.toString().padStart(2, '0')}:00") }
         val v = SpotScorer.verdict(ulu, poor + clean)
         assertTrue(v.bestWindow != null, "a clean run exists")
         assertEquals("2026-08-15T08:00", v.bestWindow!!.startIso)
