@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import cx.viz.balisurf.data.SessionLogStore
 import cx.viz.balisurf.domain.Conditions
 import cx.viz.balisurf.scoring.SpotScorer
-import kotlinx.datetime.Clock
 import balisurf.composeapp.generated.resources.Res
 import balisurf.composeapp.generated.resources.reef_bingin
 import balisurf.composeapp.generated.resources.reef_dreamland
@@ -181,7 +180,7 @@ private fun SessionLogCard(sf: SpotForecast, logs: SessionLogStore) {
     val snapshot: Conditions? = sf.hours.maxByOrNull { SpotScorer.scoreHour(sf.spot, it) }
 
     fun log(worked: Boolean) {
-        val ts = Clock.System.now().toString().take(16)  // yyyy-MM-ddTHH:mm
+        val ts = kotlinx.datetime.Clock.System.now().toString().take(16)  // yyyy-MM-ddTHH:mm
         count = logs.logSession(sf.spot.id, worked, ts, conditions = snapshot)
         justLogged = worked
     }
