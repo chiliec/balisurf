@@ -211,6 +211,110 @@ object SpotCatalog {
             ),
             notes = "East coast (Serangan island). Consistent right reef, wet-season / morning offshore. More forgiving entry than Keramas.",
         ),
+
+        // ---- More Bukit / south Kuta ----
+        Spot(
+            id = "nyangnyang",
+            name = "Nyang Nyang",
+            latitude = -8.8360, longitude = 115.1010,
+            rules = SpotRules(
+                worksOnTide = setOf(TideState.MID, TideState.HIGH),
+                swellDirectionMin = 195, swellDirectionMax = 250,
+                minPeriodSeconds = 11.0,
+                minSwellHeightMeters = 1.5,
+                offshoreWindMin = 90, offshoreWindMax = 135,
+                maxWindSpeedKmh = 28.0,
+            ),
+            notes = "South Bukit. Remote, big-swell reef down a long hike; needs size and mid/high water. Emptier than the main Bukit spots.",
+        ),
+        Spot(
+            id = "airportlefts",
+            name = "Airport Lefts",
+            latitude = -8.7480, longitude = 115.1640,
+            rules = SpotRules(
+                worksOnTide = setOf(TideState.MID, TideState.HIGH),
+                swellDirectionMin = 195, swellDirectionMax = 245,
+                minPeriodSeconds = 11.0,
+                minSwellHeightMeters = 1.3,
+                offshoreWindMin = 90, offshoreWindMax = 140,
+                maxWindSpeedKmh = 26.0,
+            ),
+            notes = "Kuta reef, off the airport runway (boat access). Long left, best mid/high on a solid long-period swell. SE offshore.",
+        ),
+
+        // ---- Nusa Lembongan (SW-facing reefs off SE Bali, SE offshore) ----
+        Spot(
+            id = "shipwrecks",
+            name = "Shipwrecks (Lembongan)",
+            latitude = -8.6790, longitude = 115.4470,
+            rules = SpotRules(
+                worksOnTide = setOf(TideState.MID, TideState.HIGH),
+                swellDirectionMin = 195, swellDirectionMax = 245,
+                minPeriodSeconds = 11.0,
+                minSwellHeightMeters = 1.3,
+                offshoreWindMin = 90, offshoreWindMax = 140,
+                maxWindSpeedKmh = 28.0,
+            ),
+            notes = "Nusa Lembongan. Long right reef, best mid/high on a bigger long-period swell. SE offshore; boat/paddle access.",
+        ),
+        Spot(
+            id = "playgrounds",
+            name = "Playgrounds (Lembongan)",
+            latitude = -8.6835, longitude = 115.4520,
+            rules = SpotRules(
+                worksOnTide = setOf(TideState.MID, TideState.HIGH),
+                swellDirectionMin = 190, swellDirectionMax = 250,
+                minPeriodSeconds = 10.0,
+                minSwellHeightMeters = 1.2,
+                offshoreWindMin = 90, offshoreWindMax = 140,
+                maxWindSpeedKmh = 28.0,
+            ),
+            notes = "Nusa Lembongan. Rights and lefts over reef, a touch more forgiving than Shipwrecks. Mid/high water, SE offshore.",
+        ),
+
+        // ---- Lombok (across the strait; south + SW coasts) ----
+        Spot(
+            id = "desertpoint",
+            name = "Desert Point (Lombok)",
+            latitude = -8.7620, longitude = 115.8180,
+            rules = SpotRules(
+                worksOnTide = setOf(TideState.LOW, TideState.MID),
+                swellDirectionMin = 200, swellDirectionMax = 250,
+                minPeriodSeconds = 13.0,
+                minSwellHeightMeters = 1.5,
+                offshoreWindMin = 45, offshoreWindMax = 110, // E/NE offshore on SW Lombok
+                maxWindSpeedKmh = 25.0,
+            ),
+            notes = "SW Lombok (Bangko Bangko). World-class barrelling left, fickle — needs a big long-period SW swell and low-to-mid water. Very shallow reef, serious wave.",
+        ),
+        Spot(
+            id = "gerupuk",
+            name = "Gerupuk (Lombok)",
+            latitude = -8.9060, longitude = 116.3360,
+            rules = SpotRules(
+                worksOnTide = setOf(TideState.LOW, TideState.MID, TideState.HIGH),
+                swellDirectionMin = 160, swellDirectionMax = 220,
+                minPeriodSeconds = 9.0,
+                minSwellHeightMeters = 0.9,
+                offshoreWindMin = 315, offshoreWindMax = 45, // N-ish offshore in the bay
+                maxWindSpeedKmh = 28.0,
+            ),
+            notes = "South Lombok. Several reefs in a bay (Insides/Outsides), boat access — a tide/wind option for most conditions. Takes S/SW swell.",
+        ),
+        Spot(
+            id = "mawi",
+            name = "Mawi (Lombok)",
+            latitude = -8.8880, longitude = 116.2050,
+            rules = SpotRules(
+                worksOnTide = setOf(TideState.LOW, TideState.MID),
+                swellDirectionMin = 170, swellDirectionMax = 230,
+                minPeriodSeconds = 10.0,
+                minSwellHeightMeters = 1.2,
+                offshoreWindMin = 315, offshoreWindMax = 45,
+                maxWindSpeedKmh = 26.0,
+            ),
+            notes = "South Lombok. Powerful, hollow reef peak in a scenic bay; strong currents. Best low-to-mid on a solid S/SW swell.",
+        ),
     )
 
     fun byId(id: String): Spot? = spots.firstOrNull { it.id == id }

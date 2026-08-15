@@ -26,11 +26,12 @@ class SpotCatalogTest {
     }
 
     @Test
-    fun coordinates_are_within_bali() {
-        // Bali bounding box, generous margin. Catches a swapped lat/lon or typo.
+    fun coordinates_are_within_the_region() {
+        // Bali + Nusa islands + Lombok bounding box, generous margin. Catches a
+        // swapped lat/lon or a typo without rejecting the Lombok spots.
         SpotCatalog.spots.forEach { s ->
-            assertTrue(s.latitude in -8.95..-8.05, "${s.id} latitude off Bali: ${s.latitude}")
-            assertTrue(s.longitude in 114.4..115.75, "${s.id} longitude off Bali: ${s.longitude}")
+            assertTrue(s.latitude in -9.1..-8.0, "${s.id} latitude off-region: ${s.latitude}")
+            assertTrue(s.longitude in 114.3..116.6, "${s.id} longitude off-region: ${s.longitude}")
         }
     }
 
@@ -63,6 +64,25 @@ class SpotCatalogTest {
         // The original five must still be present.
         listOf("uluwatu", "padang", "bingin", "impossibles", "dreamland").forEach {
             assertTrue(SpotCatalog.byId(it) != null, "missing original spot $it")
+        }
+    }
+
+    @Test
+    fun covers_lembongan_and_lombok() {
+        listOf("shipwrecks", "playgrounds", "desertpoint", "gerupuk", "mawi").forEach {
+            assertTrue(SpotCatalog.byId(it) != null, "missing expansion spot $it")
+        }
+    }
+
+    @Test
+    fun wraparound_offshore_windows_are_north_crossing() {
+        // Gerupuk/Mawi use an offshore window that crosses north (min > max, e.g.
+        // 315..45). The scorer's circular windowScore handles this; this guards
+        // the intent so a "fix" that swaps them to 45..315 (the whole compass
+        // minus north) gets caught.
+        listOf("gerupuk", "mawi").forEach { id ->
+            val r = SpotCatalog.byId(id)!!.rules
+            assertTrue(r.offshoreWindMin > r.offshoreWindMax, "$id should be a north-crossing window")
         }
     }
 }
