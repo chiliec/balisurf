@@ -1,0 +1,15 @@
+# Uluwatu calibration control points.
+# PROVENANCE: general reef-break knowledge ESTIMATES, NOT measured soundings.
+# These anchor the datum/scale along a shallow-reef -> deep-channel transect
+# heading offshore (west/SW) into the Indian Ocean, matching the observed pSDB
+# gradient (shallow reef by the point, deepening to the NW). Depths are
+# approximate metres below chart-ish low water. REPLACE with real data (Allen
+# Coral Atlas export, a dive-computer track, or Vladimir's on-reef knowledge)
+# for a production-accurate map — swap this file and re-run calibrate.py.
+lat,lon,depth_m
+-8.8150,115.0865,2.0
+-8.8148,115.0858,4.0
+-8.8145,115.0850,7.0
+-8.8142,115.0842,11.0
+-8.8140,115.0835,15.0
+-8.8138,115.0828,18.0

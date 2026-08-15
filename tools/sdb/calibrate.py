@@ -67,8 +67,10 @@ def gebco_grid(bounds_ll, n):
 def read_csv(path):
     rows = []
     with open(path, newline="") as f:
-        for d in csv.DictReader(f):
-            rows.append((float(d["lat"]), float(d["lon"]), float(d["depth_m"])))
+        # Skip blank lines and #-comments so provenance headers don't break parsing.
+        lines = [ln for ln in f if ln.strip() and not ln.lstrip().startswith("#")]
+    for d in csv.DictReader(lines):
+        rows.append((float(d["lat"]), float(d["lon"]), float(d["depth_m"])))
     return rows
 
 
