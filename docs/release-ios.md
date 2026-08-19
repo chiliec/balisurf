@@ -25,8 +25,13 @@ deliver refuses to submit until all of these are set. Run the scripts with
   Copernicus Sentinel-derived reef overlays). DONE.
 - **Pricing: Free** — `scripts/asc_pricing_free.rb` (POSTs an appPriceSchedule with
   the USA free price point; spaceship has no support for this). DONE.
-- **App Privacy: "no data collected"** — web UI only, no public ASC API. Matches
-  `PRIVACY.md`: everything (session logs, forecasts) stays on device.
+- **App Privacy: "no data collected"** — `bundle exec fastlane ios privacy` with
+  `FASTLANE_USER=<apple id>` (or the ASC web UI). The payload is
+  `fastlane/app_privacy_details.json` (`DATA_NOT_COLLECTED`), matching
+  `PRIVACY.md`: session logs and forecasts never leave the device. This is the
+  one gate the API key cannot clear — the `apps/<id>/dataUsages` resources exist
+  only on the iris API behind an Apple ID web session, so the lane prompts for
+  2FA.
 - **Listing metadata + screenshots** — `-f lane=release`. DONE.
 
 `scripts/asc_state.rb` is a read-only dump of all of the above (plus the build

@@ -249,6 +249,21 @@ platform :ios do
     )
   end
 
+  desc "Publish App Privacy: 'Data Not Collected' (needs an Apple ID + 2FA, not the API key)"
+  # The App Privacy resources (apps/<id>/dataUsages) live ONLY on the iris API
+  # behind a web session — with an API-key token they 404 ("relationship
+  # 'dataUsages' does not exist"). So this one lane asks for FASTLANE_USER and a
+  # 2FA code; everything it uploads is in fastlane/app_privacy_details.json
+  # (no data collected, matching PRIVACY.md).
+  lane :privacy do
+    upload_app_privacy_details_to_app_store(
+      username: ENV.fetch("FASTLANE_USER") { UI.user_error!("Set FASTLANE_USER to the Apple ID") },
+      team_id: ENV["FASTLANE_ITC_TEAM_ID"],
+      app_identifier: APP_IDENTIFIER,
+      json_path: File.expand_path("app_privacy_details.json", __dir__)
+    )
+  end
+
   desc "Submit the APP_VERSION App Store version for review (attaches the latest build)"
   # Assumes the listing is already uploaded (release lane), the age rating and
   # content-rights declaration are set, Pricing is set to Free, and App Privacy is
