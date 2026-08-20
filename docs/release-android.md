@@ -2,11 +2,15 @@
 
 This pipeline is ported from `chiliec/slovo`. It builds a signed AAB and uploads
 it to Play via fastlane `supply`, degrading gracefully: no signing secret →
-unsigned artifact only; no Play key → build-only, no upload. **Nothing here was
-built or run in the authoring environment** (no JDK/Android SDK) — the Gradle
-build and every fastlane lane are prepared blind and must be exercised on a Mac /
-in CI. iOS is wired separately: `iosApp/` + the `platform :ios` lanes in the
-Fastfile (see its header for the signing model) + `.github/workflows/ios-testflight.yml`.
+unsigned artifact only; no Play key → build-only, no upload. iOS is wired
+separately: `iosApp/` + the `platform :ios` lanes in the Fastfile (see its header
+for the signing model) + `.github/workflows/ios-testflight.yml`.
+
+**Verified locally on 2026-08-20**: upload keystore generated, `bundleRelease`
+produces an AAB that `jarsigner -verify` accepts under
+`CN=BaliSurf, O=viz.cx, C=US` (SHA1 `06:4C:25:F8:99:0F:DD:EF:4B:AD:53:4E:BC:27:91:03:7D:6D:C0:16`),
+`play_stage` maps the real store assets. Everything below the Play Console line
+is still untested — there is no app record yet.
 
 ## What only a human can do (blockers)
 
@@ -98,23 +102,41 @@ CLOSED track for 14 consecutive days** before production is unlocked. `play_clos
 starts that clock — but a `draft` release is invisible to testers, so publish it
 (or pass `PLAY_RELEASE_STATUS=completed`) before the days count.
 
-## Replace before launch
+## Store art
 
-- `store-assets/icons/play-icon-512.png`, `feature-graphic/play-feature-1024x500.png`,
-  and `screenshots/android/*` are **generated placeholders** — replace with real
-  captures. Screenshots must be ≤2:1 side ratio; feature graphic exactly 1024×500;
-  icon 512×512.
-- Confirm the store text in `store-assets/metadata/android/en-US/`.
-- The launcher icon in `composeApp/src/androidMain/res/mipmap-*` is copied from a
-  sibling app.
+`tools/gen-art.swift` renders every raster asset — the adaptive launcher
+foreground + legacy/round icons at all five densities, the Play 512 icon and the
+1024×500 feature graphic — from the Tropic Clean palette using CoreGraphics
+(this machine has no ImageMagick/PIL and needs none):
+
+```bash
+swift tools/gen-art.swift
+```
+
+The mark is code, not a binary to hand-edit; re-run it after a palette change and
+keep `ic_launcher_background` in `androidMain/res/values/colors.xml` in step.
+
+Screenshots are captured on the `slovo_qa` AVD (Pixel 6, 1080×2400) headless:
+
+```bash
+emulator -avd slovo_qa -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
+adb install -r composeApp/build/outputs/apk/debug/composeApp-debug.apk
+adb shell am start -n cx.viz.balisurf/.MainActivity
+adb exec-out screencap -p > shot.png          # navigate with `adb shell input tap/swipe`
+sips -c 2160 1080 --cropOffset 150 0 shot.png --out 01-name.png
+```
+
+That last crop is not cosmetic: Play rejects a side ratio above 2:1 and 1080×2400
+is 2.22:1. Cropping 150px off the top also drops the status bar. `supply` picks
+the files up in sorted filename order, so keep the `NN-` prefixes.
 
 ## Pre-upload checklist
 
 - [ ] Play Console account created, `cx.viz.balisurf` app record created, Play App
-      Signing enrolled.
+      Signing enrolled. **← the only blocker left**
 - [ ] Service account JSON created (Release manager), `play-service-account.json`
       in place — §A.
-- [ ] Upload keystore generated + `keystore.properties` filled — §B.
+- [x] Upload keystore generated + `keystore.properties` filled — §B.
 - [ ] (CI only) `ANDROID_KEYSTORE_*` + `PLAY_JSON_KEY` GitHub secrets set — §C.
-- [ ] Real store images + text in `store-assets/`.
+- [x] Real store images + text in `store-assets/`.
 - [ ] `PLAY_VALIDATE_ONLY=1` dry run passed.

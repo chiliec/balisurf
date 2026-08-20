@@ -94,7 +94,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = resolvedVersionCode
-        versionName = "0.1.0"
+        versionName = "1.0.0"
     }
     packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
     buildFeatures { buildConfig = true }

@@ -1,1 +1,1 @@
-Initial release. Five Bukit spots, star verdicts, 24h timeline, free tide times, satellite reef maps, and session logging.
+Initial release. 20 spots across the Bukit, Canggu, the east coast, Nusa Lembongan and Lombok — star verdicts, 24h timeline, free tide times, satellite reef maps, and session logging.
