@@ -1,4 +1,5 @@
 app_identifier("cx.viz.balisurf")
-team_id("7JF6XQC536") # Vladimir Babin — Apple Developer Program team
+team_id("7JF6XQC536")      # Vladimir Babin — Apple Developer Program team
+itc_team_id("122782012")   # same team on the App Store Connect side (Apple-ID-session lanes only)
 
 # No apple_id / itc login: all App Store Connect auth is via the API key.
