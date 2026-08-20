@@ -132,11 +132,27 @@ the files up in sorted filename order, so keep the `NN-` prefixes.
 
 ## Pre-upload checklist
 
-- [ ] Play Console account created, `cx.viz.balisurf` app record created, Play App
-      Signing enrolled. **← the only blocker left**
-- [ ] Service account JSON created (Release manager), `play-service-account.json`
-      in place — §A.
+- [x] Play Console account created, `cx.viz.balisurf` app record created, Play App
+      Signing enrolled.
+- [x] Service account JSON (Release manager) — **reused from the sibling slovo app**:
+      `slovo-play-publisher@russian-app-505513.iam.gserviceaccount.com`, granted
+      access to this app in the console. The file stays in `~/Develop/Pet/russian-app/`;
+      pass it in as `PLAY_JSON_KEY=$(base64 -i <that path>)` rather than copying a
+      live credential into this repo. One key now controls both apps — rotating it
+      breaks both.
 - [x] Upload keystore generated + `keystore.properties` filled — §B.
 - [ ] (CI only) `ANDROID_KEYSTORE_*` + `PLAY_JSON_KEY` GitHub secrets set — §C.
+      Uploads are local-only until these exist.
 - [x] Real store images + text in `store-assets/`.
-- [ ] `PLAY_VALIDATE_ONLY=1` dry run passed.
+- [x] `PLAY_VALIDATE_ONLY=1` dry run passed.
+- [x] **versionCode 1 uploaded to the internal track 2026-08-20**, as a `draft`
+      release — invisible to testers until published in the console.
+
+## Gotcha: stale Gradle daemon
+
+`bundleRelease` failed once with `Could not generate a decorated class for type
+PackageBundleTask > Type com.android.bundle.Config$BundleConfig$BundleType not
+present`. The bundletool jar was fine (sha1 matched Google's published one and the
+class was in it) — it was a stale daemon holding a broken classloader. Fix:
+`./gradlew --stop && rm -rf .gradle .kotlin`, then rebuild. `--refresh-dependencies`
+does *not* help; don't go hunting the dependency graph.
