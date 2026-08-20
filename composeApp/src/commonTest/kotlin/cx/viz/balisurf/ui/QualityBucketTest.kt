@@ -32,4 +32,15 @@ class QualityBucketTest {
         assertEquals(6, shades.toSet().size)
         assertEquals(BaliColors.Teal, barShade(4))
     }
+
+    @Test
+    fun headerDateFormatsIsoHour() {
+        // 2000-01-01 was a Saturday — a date whose weekday is beyond doubt.
+        assertEquals("Sat 1 Jan", headerDate("2000-01-01T00:00"))
+    }
+
+    @Test
+    fun headerDateSwallowsGarbage() {
+        assertEquals("", headerDate("not-a-date"))
+    }
 }

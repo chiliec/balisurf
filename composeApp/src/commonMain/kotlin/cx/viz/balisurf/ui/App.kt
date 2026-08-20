@@ -1,15 +1,23 @@
 package cx.viz.balisurf.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -24,15 +32,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import cx.viz.balisurf.domain.TideEvent
+import kotlinx.datetime.LocalDate
 
 /**
- * MVP UI: a list screen of the 5 Bukit spots; tapping one opens a detail screen
- * with the 24h timeline, tides, and reef notes. The product value is the verdict
- * text + timeline, not chrome. Single-level nav via selection state — no nav lib
- * needed for one level.
+ * MVP UI: a list screen of the catalog spots grouped by region; tapping one opens
+ * a detail screen. The product value is the verdict + timeline, not chrome.
+ * Single-level nav via selection state — no nav lib needed for one level.
  */
 @Composable
-fun App(module: AppModule) = MaterialTheme {
+fun App(module: AppModule) = BaliSurfTheme {
     var state by remember { mutableStateOf<List<SpotForecast>?>(null) }
     var selectedId by remember { mutableStateOf<String?>(null) }
 
@@ -49,10 +58,10 @@ fun App(module: AppModule) = MaterialTheme {
             logs = module.logs,
             onBack = { selectedId = null },
         )
-        return@MaterialTheme
+        return@BaliSurfTheme
     }
 
-    Scaffold { padding ->
+    Scaffold(containerColor = MaterialTheme.colorScheme.background) { padding ->
         if (data == null) {
             Column(
                 Modifier.fillMaxSize().padding(padding),
@@ -63,8 +72,7 @@ fun App(module: AppModule) = MaterialTheme {
                 Text("Reading the ocean…", Modifier.padding(top = 12.dp))
             }
         } else {
-            // Group by region, preserving catalog order. Best spot's stars per
-            // region could sort later; for now keep the curated order.
+            // Group by region, preserving catalog order.
             val grouped = data.groupBy { it.spot.region }
             LazyColumn(
                 Modifier.fillMaxSize().padding(padding),
@@ -72,20 +80,26 @@ fun App(module: AppModule) = MaterialTheme {
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 item {
-                    Text(
-                        "Bali surf — today",
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(vertical = 8.dp),
-                    )
+                    Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(vertical = 8.dp)) {
+                        Text(
+                            "BaliSurf",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = BaliColors.DeepTeal,
+                        )
+                        data.firstNotNullOfOrNull { it.hours.firstOrNull()?.timeIso }?.let {
+                            Text(
+                                "  ·  ${headerDate(it)}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                                modifier = Modifier.padding(bottom = 2.dp),
+                            )
+                        }
+                    }
                 }
                 grouped.forEach { (region, spots) ->
                     item(key = "hdr-$region") {
-                        Text(
-                            region,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(top = 12.dp, bottom = 2.dp),
-                        )
+                        SectionLabel(region, Modifier.padding(top = 14.dp, bottom = 2.dp))
                     }
                     items(spots, key = { it.spot.id }) { sf ->
                         SpotCard(sf, onClick = { selectedId = sf.spot.id })
@@ -95,6 +109,7 @@ fun App(module: AppModule) = MaterialTheme {
                     Text(
                         "Forecast data © Open-Meteo (CC BY 4.0). Tides are relative bands, not chart datum.",
                         style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                         modifier = Modifier.padding(top = 12.dp),
                     )
                 }
@@ -105,28 +120,48 @@ fun App(module: AppModule) = MaterialTheme {
 
 @Composable
 private fun SpotCard(sf: SpotForecast, onClick: () -> Unit) {
-    Card(Modifier.fillMaxWidth().clickable(onClick = onClick)) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            val stars = sf.verdict?.stars ?: 0
-            Text(
-                "${sf.spot.name}   ${"★".repeat(stars)}${"☆".repeat(5 - stars)}",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(sf.verdict?.headline ?: "No forecast available")
-            sf.verdict?.bestWindow?.let { w ->
-                Text(
-                    "Best window: ${hhmm(w.startIso)}–${hhmm(w.endIso)} (${w.peakStars}★)",
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            }
-            if (sf.tides.isNotEmpty()) {
-                Text(
-                    "Tides: " + sf.tides.joinToString("  ") {
-                        "${if (it.kind.name == "HIGH") "▲" else "▼"} ${hhmm(it.timeIso)}"
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                )
+    val stars = sf.verdict?.stars ?: 0
+    val bucket = qualityBucket(stars)
+    Card(
+        Modifier.fillMaxWidth().clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+    ) {
+        Row(Modifier.height(IntrinsicSize.Min)) {
+            // Quality accent border.
+            Box(Modifier.width(4.dp).fillMaxHeight().background(bucket.container))
+            Column(Modifier.weight(1f).padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        sf.spot.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    VerdictChip(stars)
+                }
+                Text(sf.verdict?.headline ?: "No forecast available", style = MaterialTheme.typography.bodyMedium)
+                if (sf.hours.isNotEmpty()) {
+                    HourBars(sf.spot, sf.hours, height = 24.dp)
+                }
+                val meta = buildList {
+                    sf.verdict?.bestWindow?.let { add("Best ${hhmm(it.startIso)}–${hhmm(it.endIso)}") }
+                    if (sf.tides.isNotEmpty()) {
+                        add(sf.tides.joinToString("  ") {
+                            "${if (it.kind == TideEvent.Kind.HIGH) "▲" else "▼"} ${hhmm(it.timeIso)}"
+                        })
+                    }
+                }.joinToString(" · ")
+                if (meta.isNotEmpty()) {
+                    Text(
+                        meta,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f),
+                    )
+                }
             }
         }
     }
@@ -134,3 +169,10 @@ private fun SpotCard(sf: SpotForecast, onClick: () -> Unit) {
 
 /** "2026-08-15T07:00" -> "07:00". Shared with the detail screen. */
 internal fun hhmm(iso: String): String = iso.substringAfter('T').take(5)
+
+/** "2026-08-20T07:00" -> "Wed 20 Aug" — header date from forecast data, no platform clock. */
+internal fun headerDate(iso: String): String = runCatching {
+    val d = LocalDate.parse(iso.substringBefore('T'))
+    fun cap(s: String) = s.lowercase().replaceFirstChar { it.uppercase() }
+    "${cap(d.dayOfWeek.name).take(3)} ${d.dayOfMonth} ${cap(d.month.name).take(3)}"
+}.getOrDefault("")
