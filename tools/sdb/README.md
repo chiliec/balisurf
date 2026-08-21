@@ -1,5 +1,9 @@
 # Satellite-Derived Bathymetry (SDB) — the moat
 
+> **Method background:** [`docs/SDB-METHODS.md`](../../docs/SDB-METHODS.md) — the
+> primary-source grounding (algorithms, published accuracy numbers, ESA offset,
+> failure modes) behind this pipeline, with a source ledger.
+
 Open forecast data is a commodity; **reef bathymetry is not**. No open dataset
 gives Bali spot bottom-shape at surf resolution — the commercial ones charge
 thousands per site. This tool builds it ourselves, for **$0**, from free
