@@ -46,15 +46,19 @@ import balisurf.composeapp.generated.resources.Res
 import balisurf.composeapp.generated.resources.reef_balangan
 import balisurf.composeapp.generated.resources.reef_batubolong
 import balisurf.composeapp.generated.resources.reef_bingin
+import balisurf.composeapp.generated.resources.reef_canggu
 import balisurf.composeapp.generated.resources.reef_desertpoint
 import balisurf.composeapp.generated.resources.reef_dreamland
 import balisurf.composeapp.generated.resources.reef_greenbowl
 import balisurf.composeapp.generated.resources.reef_impossibles
 import balisurf.composeapp.generated.resources.reef_keramas
+import balisurf.composeapp.generated.resources.reef_mawi
 import balisurf.composeapp.generated.resources.reef_medewi
 import balisurf.composeapp.generated.resources.reef_nusadua
 import balisurf.composeapp.generated.resources.reef_nyangnyang
 import balisurf.composeapp.generated.resources.reef_padang
+import balisurf.composeapp.generated.resources.reef_playgrounds
+import balisurf.composeapp.generated.resources.reef_serangan
 import balisurf.composeapp.generated.resources.reef_shipwrecks
 import balisurf.composeapp.generated.resources.reef_uluwatu
 import org.jetbrains.compose.resources.DrawableResource
@@ -292,6 +296,10 @@ private fun reefDrawable(spotId: String): DrawableResource? = when (spotId) {
     "shipwrecks" -> Res.drawable.reef_shipwrecks
     "keramas" -> Res.drawable.reef_keramas
     "medewi" -> Res.drawable.reef_medewi
+    "canggu" -> Res.drawable.reef_canggu
+    "serangan" -> Res.drawable.reef_serangan
+    "playgrounds" -> Res.drawable.reef_playgrounds
+    "mawi" -> Res.drawable.reef_mawi
     else -> null
 }
 

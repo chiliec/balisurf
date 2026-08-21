@@ -22,7 +22,7 @@ composeApp/src/commonMain/kotlin/cx/viz/balisurf/
 composeApp/src/commonTest/  36 tests. The scoring + catalog tests ARE the spec.
 composeApp/src/androidMain/ MainActivity, AndroidLogFileIo, Clock, manifest, res.
 composeApp/src/iosMain/     MainViewController, IosLogFileIo, Clock.
-composeApp/src/commonMain/composeResources/drawable/  reef_<spot>.png overlays (14).
+composeApp/src/commonMain/composeResources/drawable/  reef_<spot>.png overlays (18).
 tools/sdb/    Python: satellite-derived-bathymetry pipeline (the moat). See its README.
 iosApp/       Xcode project (ported from slovo). Thin: AppDelegate/SceneDelegate
               hand off to MainViewController(); a Run Script phase builds the
@@ -100,5 +100,6 @@ against control points. `composite.py` medians multiple scenes for cloudy spots.
   (the `ios release` lane will error until they exist).
 - **Real spot-rule calibration** — needs field session logs or your local knowledge.
 - **Backend fan-out** — client-direct is fine < ~500 users; see docs/ECONOMICS.md.
-- **6 spots lack reef overlays** (boat-access/deep-water SDB failures).
+- **2 spots lack reef overlays** (airportlefts, gerupuk — deep-channel / bay
+  reef-flat where SDB has no usable gradient).
 - **Placeholder store art + launcher icon** — replace before a public launch.

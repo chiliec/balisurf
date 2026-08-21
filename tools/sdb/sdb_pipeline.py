@@ -36,7 +36,7 @@ COLLECTION = "sentinel-2-l2a"
 SCL_WATER = {6}
 
 
-def find_scene(bbox, max_cloud=10.0):
+def find_scene(bbox, max_cloud=10.0, from_date="2022-06-01"):
     body = {
         "collections": [COLLECTION],
         "bbox": bbox,
@@ -44,6 +44,12 @@ def find_scene(bbox, max_cloud=10.0):
         "limit": 1,
         "sortby": [{"field": "properties.eo:cloud_cover", "direction": "asc"}],
     }
+    if from_date:
+        # Sentinel-2's Jan-2022 processing baseline added a -1000 radiometric
+        # offset; restricting to post-baseline scenes avoids a degenerate pSDB
+        # from a pre-2022 scene. Default guards this without changing behaviour
+        # for callers that pass an explicit older date.
+        body["datetime"] = f"{from_date}T00:00:00Z/2100-01-01T00:00:00Z"
     req = urllib.request.Request(
         STAC, data=json.dumps(body).encode(), headers={"Content-Type": "application/json"}
     )
@@ -123,6 +129,10 @@ def main():
     ap.add_argument("--half-km", type=float, default=0.8,
                     help="half-width of the square AOI in km")
     ap.add_argument("--max-cloud", type=float, default=10.0)
+    ap.add_argument("--from-date", default="2022-06-01",
+                    help="earliest scene date (YYYY-MM-DD). Defaults to post the "
+                         "Jan-2022 processing baseline to avoid the -1000 offset "
+                         "trap; pass an older date to widen the search.")
     ap.add_argument("--out-dir", default="out")
     args = ap.parse_args()
 
@@ -131,7 +141,7 @@ def main():
     dlon = args.half_km / (111.0 * math.cos(math.radians(args.lat)))
     bbox = [args.lon - dlon, args.lat - dlat, args.lon + dlon, args.lat + dlat]
 
-    scene = find_scene(bbox, args.max_cloud)
+    scene = find_scene(bbox, args.max_cloud, args.from_date)
     print(f"scene {scene['id']}  {scene['date']}  cloud {scene['cloud']:.2f}%")
 
     blue, tr, crs = read_window(scene["blue"], bbox)
