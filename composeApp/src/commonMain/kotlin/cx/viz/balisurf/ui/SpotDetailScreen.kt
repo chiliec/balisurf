@@ -43,12 +43,14 @@ import cx.viz.balisurf.domain.TideEvent
 import cx.viz.balisurf.platform.nowIso
 import cx.viz.balisurf.scoring.SpotScorer
 import balisurf.composeapp.generated.resources.Res
+import balisurf.composeapp.generated.resources.reef_airportlefts
 import balisurf.composeapp.generated.resources.reef_balangan
 import balisurf.composeapp.generated.resources.reef_batubolong
 import balisurf.composeapp.generated.resources.reef_bingin
 import balisurf.composeapp.generated.resources.reef_canggu
 import balisurf.composeapp.generated.resources.reef_desertpoint
 import balisurf.composeapp.generated.resources.reef_dreamland
+import balisurf.composeapp.generated.resources.reef_gerupuk
 import balisurf.composeapp.generated.resources.reef_greenbowl
 import balisurf.composeapp.generated.resources.reef_impossibles
 import balisurf.composeapp.generated.resources.reef_keramas
@@ -278,9 +280,10 @@ private fun SessionLogCard(sf: SpotForecast, logs: SessionLogStore, snapshot: Co
     }
 }
 
-/** Map a spot id to its bundled reef-bathymetry drawable, or null if none. Only
- * spots whose SDB produced a coherent map are included; the rest (boat-access,
- * deep-water, or cloud-contaminated AOIs) show no reef card. */
+/** Map a spot id to its bundled reef-bathymetry drawable, or null if none. All
+ * 20 catalog spots now have a coherent SDB map; the null branch stays as a
+ * graceful fallback for any future spot whose AOI can't be resolved to a
+ * coherent reef (deep-channel, cloud-contaminated, or un-reframeable). */
 private fun reefDrawable(spotId: String): DrawableResource? = when (spotId) {
     "uluwatu" -> Res.drawable.reef_uluwatu
     "padang" -> Res.drawable.reef_padang
@@ -300,6 +303,8 @@ private fun reefDrawable(spotId: String): DrawableResource? = when (spotId) {
     "serangan" -> Res.drawable.reef_serangan
     "playgrounds" -> Res.drawable.reef_playgrounds
     "mawi" -> Res.drawable.reef_mawi
+    "airportlefts" -> Res.drawable.reef_airportlefts
+    "gerupuk" -> Res.drawable.reef_gerupuk
     else -> null
 }
 
