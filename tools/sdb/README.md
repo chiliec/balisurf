@@ -37,7 +37,40 @@ python sdb_pipeline.py --lat -8.8153 --lon 115.0886 --name uluwatu --half-km 0.9
 python sdb_pipeline.py --lat -8.8060 --lon 115.1120 --name bingin  --half-km 0.9
 ```
 
-Outputs land in `out/<name>_psdb.tif` and `out/<name>_psdb.png`.
+Outputs land in `out/<name>_psdb.tif`, `out/<name>_psdb.png`, and
+`out/<name>_psdb.json` — the sidecar records the AOI args, bbox, scene id/href
+and pSDB spread, so any map can be reproduced without reverse-engineering its
+framing.
+
+## AOI framing per spot
+
+The default AOI centred on the catalog coordinate lands in the deep channel for
+several spots. These are the framings that actually produced the shipped
+overlays — a seaward shift (W on Bali's west coast, S into Lombok's bay mouths)
+plus a wider window. **Re-running with the catalog coordinate reproduces the bad
+map, not these.**
+
+| Spot | Command (from `tools/sdb/`) | Shift vs catalog |
+|---|---|---|
+| serangan | `--lat -8.7380 --lon 115.2410 --half-km 0.9 --name serangan` | none |
+| canggu | `--lat -8.6510 --lon 115.1240 --half-km 1.1 --name canggu_v2` | 0.0070° W |
+| playgrounds | `--lat -8.6890 --lon 115.4470 --half-km 1.1 --name playgrounds_v2` | 0.0055° S, 0.0050° W |
+| mawi | `--lat -8.8960 --lon 116.2050 --half-km 1.1 --name mawi_v2` | 0.0080° S |
+| airportlefts | `--lat -8.7480 --lon 115.1550 --half-km 1.4 --name airportlefts_v2` | 0.0090° W |
+| gerupuk | `--lat -8.9160 --lon 116.3360 --half-km 1.4 --name gerupuk_v3` | 0.0100° S |
+
+*(These coordinates were recovered from the shipped rasters' georeferencing, not
+from a build log — each matches its catalog coordinate exactly in the unshifted
+axis, which is what confirms them. Scenes are not pinned, so a re-run may select
+a newer low-cloud scene than the one that produced the committed raster; from
+now on the JSON sidecar records the exact scene.)*
+
+Superseded files kept in `out/` for the record: `canggu_psdb.*`,
+`playgrounds_psdb.*`, `airportlefts_psdb.*` (valid rasters, wrong framing — no
+`mawi_psdb.*` exists; its first run was never committed) and `gerupuk_psdb.*`
+(**degenerate — 2-98% spread exactly 0.0000**, the
+old-baseline scene that motivated the `--from-date` default and the degeneracy
+check). None of these are wired into the app.
 
 ## Validated
 

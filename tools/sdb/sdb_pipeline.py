@@ -45,10 +45,13 @@ def find_scene(bbox, max_cloud=10.0, from_date="2022-06-01"):
         "sortby": [{"field": "properties.eo:cloud_cover", "direction": "asc"}],
     }
     if from_date:
-        # Sentinel-2's Jan-2022 processing baseline added a -1000 radiometric
-        # offset; restricting to post-baseline scenes avoids a degenerate pSDB
-        # from a pre-2022 scene. Default guards this without changing behaviour
-        # for callers that pass an explicit older date.
+        # Old-baseline (pre-2022) scenes have produced degenerate flat pSDB here:
+        # their L2A returns 0 over dark water, both bands pin to stumpf_ratio's
+        # clip floor, and the ratio collapses to exactly 1.0000. Earth Search
+        # reports the baseline state per item (`earthsearch:boa_offset_applied`
+        # is False on pre-2022 products, True after), so this date default is a
+        # blunt convenience, not the real guard — the degeneracy check at the
+        # end of main() is. Pass an older date to search the full archive.
         body["datetime"] = f"{from_date}T00:00:00Z/2100-01-01T00:00:00Z"
     req = urllib.request.Request(
         STAC, data=json.dumps(body).encode(), headers={"Content-Type": "application/json"}
@@ -179,6 +182,20 @@ def main():
         sys.exit("No water pixels in AOI — check coordinates/cloud.")
     lo, hi = np.nanpercentile(valid, 2), np.nanpercentile(valid, 98)
 
+    # A flat pSDB carries no reef signal — it means the bands pinned to the clip
+    # floor in stumpf_ratio (old-baseline scene, all-cloud AOI, fully-masked
+    # water). Fail loudly instead of writing a raster that only an eyeball
+    # catches. Measured over every committed map, the 2-98% spread runs
+    # 0.013 (canggu) to 0.084 (serangan), and the one known-degenerate raster
+    # (the old gerupuk) sits at exactly 0.0000 — so 1e-3 separates them with
+    # >13x margin.
+    if hi - lo < 1e-3:
+        sys.exit(
+            f"Degenerate pSDB ({lo:.4f}..{hi:.4f}) — no depth signal. Bands likely "
+            f"hit the clip floor. Scene {scene['id']} ({scene['date']}); try "
+            f"another scene (--from-date/--max-cloud) or re-frame the AOI."
+        )
+
     os.makedirs(args.out_dir, exist_ok=True)
     tif = os.path.join(args.out_dir, f"{args.name}_psdb.tif")
     png = os.path.join(args.out_dir, f"{args.name}_psdb.png")
@@ -194,10 +211,22 @@ def main():
     save_heatmap(norm, png)
 
     frac = np.isfinite(pSDB).mean() * 100
+
+    # Provenance sidecar. The AOI that makes a map coherent is hand-tuned per
+    # spot (seaward shift + wider --half-km), and none of that survives in the
+    # raster — write it down so the map can be reproduced without re-deriving
+    # the framing from the GeoTIFF's corner coordinates.
+    meta = os.path.join(args.out_dir, f"{args.name}_psdb.json")
+    with open(meta, "w") as fh:
+        json.dump({"args": vars(args), "bbox": bbox, "scene": scene,
+                   "psdb_2_98": [float(lo), float(hi)],
+                   "water_pct": round(float(frac), 1)}, fh, indent=2)
+
     print(f"water pixels: {frac:.0f}% of {h}x{w} AOI")
     print(f"pSDB range (2-98%): {lo:.4f} .. {hi:.4f}  (higher = deeper)")
     print(f"wrote {tif}")
     print(f"wrote {png}")
+    print(f"wrote {meta}")
 
 
 def save_heatmap(norm01, path):

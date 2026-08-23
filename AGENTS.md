@@ -84,9 +84,11 @@ No local build env? Every green CI run publishes the APK as the
    `composeResources/drawable/reef_<id>.png` + add a branch to `reefDrawable()` in
    `SpotDetailScreen.kt`. If the first pass is low water% or sits in a deep
    channel, don't give up: widen `--half-km` and re-center the AOI onto the
-   actual reef crest (seaward shift), which recovered all 20 spots. Only a
-   genuinely deep break past SDB's ~15-20 m ceiling stays uncoverable — then
-   the card just won't show. `composite.py` helps for persistently cloudy AOIs.
+   actual reef crest (seaward shift) — that rescued the six spots that had no
+   overlay, so all 20 now have one. Record the framing you used in the AOI
+   table in `tools/sdb/README.md`. Only a genuinely deep break past SDB's
+   ~15-20 m ceiling stays uncoverable — then the card just won't show.
+   `composite.py` helps for persistently cloudy AOIs.
 
 ## Regenerate reef bathymetry
 
