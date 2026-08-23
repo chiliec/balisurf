@@ -23,6 +23,9 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5
 
+      - name: Guard committed reef rasters (no degenerate pSDB)
+        run: python3 tools/sdb/test_overlays.py
+
       - name: Run common unit tests (SpotScorer, TideClassifier)
         run: ./gradlew :composeApp:allTests --stacktrace
 

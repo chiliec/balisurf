@@ -70,11 +70,22 @@ a newer low-cloud scene than the one that produced the committed raster; from
 now on the JSON sidecar records the exact scene.)*
 
 Superseded files kept in `out/` for the record: `canggu_psdb.*`,
-`playgrounds_psdb.*`, `airportlefts_psdb.*` (valid rasters, wrong framing — no
-`mawi_psdb.*` exists; its first run was never committed) and `gerupuk_psdb.*`
-(**degenerate — 2-98% spread exactly 0.0000**, the
-old-baseline scene that motivated the `--from-date` default and the degeneracy
-check). None of these are wired into the app.
+`playgrounds_psdb.*`, `airportlefts_psdb.*` — valid rasters, wrong framing, none
+wired into the app. (No `mawi_psdb.*` exists; its first run was never committed.)
+`gerupuk_psdb.*` was **deleted**: 2-98% spread of exactly 0.0000, an
+old-baseline scene carrying no depth signal at all. It's the case that motivated
+both the `--from-date` default and the degeneracy gate.
+
+## Guard against degenerate maps
+
+```bash
+python3 test_overlays.py     # stdlib only — no numpy/rasterio/GDAL needed
+```
+
+Asserts every committed `out/*_psdb.tif` has a 2-98% spread above `1e-3` — the
+same threshold `sdb_pipeline.py` gates on, so a flat map can't be committed by
+hand or carried in from an older run even though the pipeline now refuses to
+write one. Runs in CI on every push and PR.
 
 ## Validated
 
