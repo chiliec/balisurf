@@ -60,6 +60,7 @@ fastlane/     Android/Play + iOS/TestFlight release lanes (see docs/release-andr
 
 ```bash
 ./gradlew :composeApp:allTests        # pure commonTest suite (36 tests)
+python3 tools/sdb/test_overlays.py    # committed reef rasters carry a depth signal
 ./gradlew :composeApp:assembleDebug   # sideloadable debug APK
 # iOS (needs Xcode + a JDK): open iosApp/iosApp.xcodeproj, or headless
 # (ARCHS=arm64 is required — the generic sim destination otherwise adds x86_64,
