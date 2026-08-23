@@ -22,7 +22,7 @@ composeApp/src/commonMain/kotlin/cx/viz/balisurf/
 composeApp/src/commonTest/  36 tests. The scoring + catalog tests ARE the spec.
 composeApp/src/androidMain/ MainActivity, AndroidLogFileIo, Clock, manifest, res.
 composeApp/src/iosMain/     MainViewController, IosLogFileIo, Clock.
-composeApp/src/commonMain/composeResources/drawable/  reef_<spot>.png overlays (14).
+composeApp/src/commonMain/composeResources/drawable/  reef_<spot>.png overlays (20, all spots).
 tools/sdb/    Python: satellite-derived-bathymetry pipeline (the moat). See its README.
 iosApp/       Xcode project (ported from slovo). Thin: AppDelegate/SceneDelegate
               hand off to MainViewController(); a Run Script phase builds the
@@ -82,8 +82,13 @@ No local build env? Every green CI run publishes the APK as the
 3. Optional reef overlay: `cd tools/sdb && python sdb_pipeline.py --lat .. --lon ..
    --name <id>`, eyeball the PNG, and if coherent copy it to
    `composeResources/drawable/reef_<id>.png` + add a branch to `reefDrawable()` in
-   `SpotDetailScreen.kt`. SDB fails on boat-access/deep spots — that's fine, the
-   card just won't show. Low water%? Try shifting the AOI seaward + `composite.py`.
+   `SpotDetailScreen.kt`. If the first pass is low water% or sits in a deep
+   channel, don't give up: widen `--half-km` and re-center the AOI onto the
+   actual reef crest (seaward shift) — that rescued the six spots that had no
+   overlay, so all 20 now have one. Record the framing you used in the AOI
+   table in `tools/sdb/README.md`. Only a genuinely deep break past SDB's
+   ~15-20 m ceiling stays uncoverable — then the card just won't show.
+   `composite.py` helps for persistently cloudy AOIs.
 
 ## Regenerate reef bathymetry
 
@@ -100,5 +105,4 @@ against control points. `composite.py` medians multiple scenes for cloudy spots.
   (the `ios release` lane will error until they exist).
 - **Real spot-rule calibration** — needs field session logs or your local knowledge.
 - **Backend fan-out** — client-direct is fine < ~500 users; see docs/ECONOMICS.md.
-- **6 spots lack reef overlays** (boat-access/deep-water SDB failures).
 - **Placeholder store art + launcher icon** — replace before a public launch.
