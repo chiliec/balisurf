@@ -98,7 +98,10 @@ object SpotScorer {
             return Verdict(0, "No data", null, emptyList())
         }
         val scored = hours.map { it to scoreHour(spot, it) }
-        val best = scored.maxByOrNull { it.second }!!
+        // `hours` is non-empty (guarded above), so `scored` is too — use the
+        // structurally-safe destructuring rather than maxByOrNull()!!, so a
+        // later refactor that filters `scored` can't turn this into a crash.
+        val best = scored.reduce { a, b -> if (b.second > a.second) b else a }
         val stars = toStars(best.second)
 
         val window = bestWindow(scored)

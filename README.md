@@ -10,6 +10,10 @@ turns raw conditions into a plain "go / don't go / best window today" call — p
 hand-built **reef bathymetry** derived from free satellite imagery, which nobody
 has in the open at surf resolution.
 
+| Forecast list | Spot detail | Reef & session log |
+| --- | --- | --- |
+| ![Forecast list](store-assets/screenshots/android/01-forecast-list.png) | ![Spot detail](store-assets/screenshots/android/02-spot-detail.png) | ![Reef and log](store-assets/screenshots/android/03-reef-and-log.png) |
+
 ## Docs
 
 - `AGENTS.md` — dev map, conventions, how to resume, how to add a spot.
