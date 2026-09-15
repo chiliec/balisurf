@@ -1,13 +1,18 @@
-BaliSurf gives you a straight answer for Bali, Nusa Lembongan and Lombok: is it worth paddling out, and when?
+BaliSurf answers one question for 20 named reef breaks in Bali, Nusa Lembongan and Lombok: is it worth paddling out, and when?
 
-It does not try to out-forecast the big weather models. It pulls the same swell, wind and tide data everyone has — for free — and adds the thing generic apps lack: per-spot local judgement. Each spot has hand-tuned rules for the tide, swell direction, period and wind it actually needs, and the app turns the live forecast into a plain star rating, a one-line call, and the best window today.
+Two things a generic forecast app does not give you:
 
-Features:
-• 20 spots across the region, grouped by coast: the Bukit (Uluwatu, Padang Padang, Bingin, Impossibles and more), Airport Lefts, the west coast (Canggu, Medewi), the east coast (Keramas, Nusa Dua, Serangan), Nusa Lembongan and Lombok (Desert Point, Gerupuk, Mawi).
-• Star rating + plain-language verdict per spot ("Firing", "Fun", "Wrong tide").
-• 24-hour timeline showing the best window to go.
-• High and low tide times, free — many reefs here only work on a specific tide.
-• Reef bathymetry maps derived from free satellite imagery, so you can see the bottom.
-• Log whether a spot worked — your reports sharpen the forecast for everyone.
+SEE THE REEF, NOT JUST THE NUMBERS
+Every spot ships with a bathymetry map of its own reef, processed from free Sentinel-2 satellite imagery into relative depth — warm colours are shallow reef, cool is deep water. Bali's breaks are shallow coral: seeing the bottom shows you where the takeoff sits, where the reef dries out, and why the spot needs the tide it needs.
 
-Free data from Open-Meteo (CC BY 4.0). Early access — spot rules are still being tuned with local surfers, and your session logs are how they get better.
+PER-SPOT LOCAL JUDGEMENT, NOT ONE GLOBAL RATING
+Each of the 20 spots carries its own hand-written rules: the tide window, swell direction, minimum period and wind that spot actually needs. Uluwatu wants something different from Bingin, and Keramas something different again. The app runs the live forecast through those rules and gives you a star rating, a plain-language call, and today's best window.
+
+Also inside:
+• 20 spots grouped by coast — the Bukit (Uluwatu, Padang Padang, Bingin, Impossibles, Dreamland, Balangan, Green Bowl, Nyang Nyang), Airport Lefts, the west coast (Canggu, Batu Bolong, Medewi), the east coast (Keramas, Nusa Dua, Serangan), Nusa Lembongan (Shipwrecks, Playgrounds) and Lombok (Desert Point, Gerupuk, Mawi).
+• A 24-hour timeline per spot: the go window, hour by hour.
+• High and low tide times — most of these reefs only work on one tide.
+• Verdicts in words: "Firing", "Fun", "Wrong tide".
+• Log whether a spot actually worked. Your reports tune the spot rules.
+
+No account, no ads, no tracking, nothing collected. Forecast data is free public data from Open-Meteo (CC BY 4.0).
