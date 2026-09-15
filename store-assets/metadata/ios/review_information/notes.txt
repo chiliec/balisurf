@@ -1,1 +1,9 @@
-Free surf forecast app. No account or login required, no purchases. Forecast data is fetched live from the free Open-Meteo API; session logs stay on device. No demo credentials needed.
+Free surf forecast app for Bali, Nusa Lembongan and Lombok. No account or login, no purchases, no demo credentials needed. Forecast data is fetched live from the free Open-Meteo API (CC BY 4.0); session logs stay on the device.
+
+This version was previously rejected under Guideline 4.3(a). Two things in the app are original content, and both are quick to see:
+
+1. Reef bathymetry maps. Open any spot from the list, then scroll to the "REEF - SATELLITE BATHYMETRY" card. Each of the 20 spots ships its own reef map, which we generated from free Sentinel-2 satellite imagery (Stumpf/Lyzenga log-ratio relative depth). Warm colours are shallow reef, cool is deep water. These rasters are produced by us and ship inside the binary; they are not licensed or scraped.
+
+2. Per-spot rules rather than one global rating. Every spot carries hand-written rules for the tide window, swell direction, minimum period and wind it needs, so on the same forecast the app rates spots differently - scroll the list and you will typically see spots rated 5 stars a few rows away from spots rated flat ("wrong tide or too small"). Tap a spot to see the factors behind its rating.
+
+The app is a single Compose Multiplatform module written by the developer; no third-party template, and no third-party surf-forecast provider's data, branding or SDK. Full source: https://github.com/chiliec/balisurf
