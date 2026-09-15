@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -74,103 +75,109 @@ import org.jetbrains.compose.resources.painterResource
  */
 @Composable
 fun SpotDetailScreen(sf: SpotForecast, logs: SessionLogStore, onBack: () -> Unit) {
-    Column(
-        Modifier.fillMaxSize()
-            .background(BaliColors.Background)
-            .verticalScroll(rememberScrollState()),
-    ) {
-        HeroHeader(sf, onBack)
-
+    // DeepTeal fills the status-bar strip and the scrolling column is inset below
+    // it, so cards never slide under the clock. It matches the top of the hero's
+    // vertical gradient, which keeps the two reading as one surface at rest.
+    Box(Modifier.fillMaxSize().background(BaliColors.DeepTeal)) {
         Column(
-            Modifier.padding(16.dp).navigationBarsPadding(),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            Modifier.fillMaxSize()
+                .statusBarsPadding()
+                .background(BaliColors.Background)
+                .verticalScroll(rememberScrollState()),
         ) {
-            if (sf.hours.isNotEmpty()) {
-                SectionCard("Next 24h") {
-                    HourBars(sf.spot, sf.hours, height = 80.dp)
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        val n = sf.hours.size
-                        listOf(0, n / 4, n / 2, 3 * n / 4, n - 1).forEach { idx ->
-                            sf.hours.getOrNull(idx)?.let {
-                                Text(hhmm(it.timeIso), style = MaterialTheme.typography.labelSmall)
+            HeroHeader(sf, onBack)
+
+            Column(
+                Modifier.padding(16.dp).navigationBarsPadding(),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                if (sf.hours.isNotEmpty()) {
+                    SectionCard("Next 24h") {
+                        HourBars(sf.spot, sf.hours, height = 80.dp)
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            val n = sf.hours.size
+                            listOf(0, n / 4, n / 2, 3 * n / 4, n - 1).forEach { idx ->
+                                sf.hours.getOrNull(idx)?.let {
+                                    Text(hhmm(it.timeIso), style = MaterialTheme.typography.labelSmall)
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            // Peak hour of the day = a representative read for the tiles + log snapshot.
-            val peak: Conditions? = sf.hours.maxByOrNull { SpotScorer.scoreHour(sf.spot, it) }
-            peak?.let { c ->
-                SectionCard("Peak conditions") {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ConditionTile(
-                            "Swell", "${fmt1(c.swellHeightMeters)} m",
-                            "${SpotScorer.compass(c.swellDirectionDeg)} @ ${c.swellPeriodSeconds.toInt()}s",
-                            Modifier.weight(1f),
-                        )
-                        ConditionTile(
-                            "Wind", "${fmt1(c.windSpeedKmh)} km/h",
-                            SpotScorer.compass(c.windDirectionDeg), Modifier.weight(1f),
-                        )
-                    }
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ConditionTile("Tide", c.tide.name, "${fmt1(c.tideHeightMeters)} m", Modifier.weight(1f))
-                        val w = sf.verdict?.bestWindow
-                        ConditionTile(
-                            "Window",
-                            w?.let { "${hhmm(it.startIso)}–${hhmm(it.endIso)}" } ?: "—",
-                            w?.let { "peak ${it.peakStars}★" } ?: "no window",
-                            Modifier.weight(1f),
-                        )
-                    }
-                }
-            }
-
-            if (sf.tides.isNotEmpty()) {
-                SectionCard("Tides") {
-                    @OptIn(ExperimentalLayoutApi::class)
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp),
-                    ) {
-                        sf.tides.forEach { t ->
-                            val arrow = if (t.kind == TideEvent.Kind.HIGH) "▲" else "▼"
-                            Text(
-                                "$arrow ${hhmm(t.timeIso)} · ${fmt1(t.heightMeters)} m",
-                                Modifier.background(BaliColors.CardTint, RoundedCornerShape(50))
-                                    .padding(horizontal = 10.dp, vertical = 5.dp),
-                                color = BaliColors.DeepTeal,
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold,
+                // Peak hour of the day = a representative read for the tiles + log snapshot.
+                val peak: Conditions? = sf.hours.maxByOrNull { SpotScorer.scoreHour(sf.spot, it) }
+                peak?.let { c ->
+                    SectionCard("Peak conditions") {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            ConditionTile(
+                                "Swell", "${fmt1(c.swellHeightMeters)} m",
+                                "${SpotScorer.compass(c.swellDirectionDeg)} @ ${c.swellPeriodSeconds.toInt()}s",
+                                Modifier.weight(1f),
+                            )
+                            ConditionTile(
+                                "Wind", "${fmt1(c.windSpeedKmh)} km/h",
+                                SpotScorer.compass(c.windDirectionDeg), Modifier.weight(1f),
+                            )
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            ConditionTile("Tide", c.tide.name, "${fmt1(c.tideHeightMeters)} m", Modifier.weight(1f))
+                            val w = sf.verdict?.bestWindow
+                            ConditionTile(
+                                "Window",
+                                w?.let { "${hhmm(it.startIso)}–${hhmm(it.endIso)}" } ?: "—",
+                                w?.let { "peak ${it.peakStars}★" } ?: "no window",
+                                Modifier.weight(1f),
                             )
                         }
                     }
                 }
-            }
 
-            reefDrawable(sf.spot.id)?.let { res ->
-                SectionCard("Reef · satellite bathymetry") {
-                    Image(
-                        painter = painterResource(res),
-                        contentDescription = "${sf.spot.name} reef bathymetry",
-                        modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-                        contentScale = ContentScale.Fit,
-                    )
-                    Text(
-                        "Warm = shallow reef, cool = deep water. Derived from free Sentinel-2 " +
-                            "imagery (relative depth). Experimental.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f),
-                    )
+                if (sf.tides.isNotEmpty()) {
+                    SectionCard("Tides") {
+                        @OptIn(ExperimentalLayoutApi::class)
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            sf.tides.forEach { t ->
+                                val arrow = if (t.kind == TideEvent.Kind.HIGH) "▲" else "▼"
+                                Text(
+                                    "$arrow ${hhmm(t.timeIso)} · ${fmt1(t.heightMeters)} m",
+                                    Modifier.background(BaliColors.CardTint, RoundedCornerShape(50))
+                                        .padding(horizontal = 10.dp, vertical = 5.dp),
+                                    color = BaliColors.DeepTeal,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+                        }
+                    }
                 }
-            }
 
-            if (sf.spot.notes.isNotBlank()) {
-                Text(sf.spot.notes, style = MaterialTheme.typography.bodyMedium)
-            }
+                reefDrawable(sf.spot.id)?.let { res ->
+                    SectionCard("Reef · satellite bathymetry") {
+                        Image(
+                            painter = painterResource(res),
+                            contentDescription = "${sf.spot.name} reef bathymetry",
+                            modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+                            contentScale = ContentScale.Fit,
+                        )
+                        Text(
+                            "Warm = shallow reef, cool = deep water. Derived from free Sentinel-2 " +
+                                "imagery (relative depth). Experimental.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f),
+                        )
+                    }
+                }
 
-            SessionLogCard(sf, logs, snapshot = peak)
+                if (sf.spot.notes.isNotBlank()) {
+                    Text(sf.spot.notes, style = MaterialTheme.typography.bodyMedium)
+                }
+
+                SessionLogCard(sf, logs, snapshot = peak)
+            }
         }
     }
 }
@@ -180,8 +187,7 @@ private fun HeroHeader(sf: SpotForecast, onBack: () -> Unit) {
     val stars = sf.verdict?.stars ?: 0
     Column(
         Modifier.fillMaxWidth()
-            .background(Brush.linearGradient(listOf(BaliColors.DeepTeal, BaliColors.Teal)))
-            .statusBarsPadding()
+            .background(Brush.verticalGradient(listOf(BaliColors.DeepTeal, BaliColors.Teal)))
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
