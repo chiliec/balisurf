@@ -42,8 +42,15 @@ import cx.viz.balisurf.data.SessionLogStore
 import cx.viz.balisurf.domain.Conditions
 import cx.viz.balisurf.domain.TideEvent
 import cx.viz.balisurf.platform.nowIso
-import cx.viz.balisurf.scoring.SpotScorer
 import balisurf.composeapp.generated.resources.Res
+import balisurf.composeapp.generated.resources.back_to_spots
+import balisurf.composeapp.generated.resources.best_window
+import balisurf.composeapp.generated.resources.dash
+import balisurf.composeapp.generated.resources.log_didnt
+import balisurf.composeapp.generated.resources.log_report_count
+import balisurf.composeapp.generated.resources.log_thanks_no
+import balisurf.composeapp.generated.resources.log_thanks_yes
+import balisurf.composeapp.generated.resources.log_worked
 import balisurf.composeapp.generated.resources.reef_airportlefts
 import balisurf.composeapp.generated.resources.reef_balangan
 import balisurf.composeapp.generated.resources.reef_batubolong
@@ -64,14 +71,33 @@ import balisurf.composeapp.generated.resources.reef_playgrounds
 import balisurf.composeapp.generated.resources.reef_serangan
 import balisurf.composeapp.generated.resources.reef_shipwrecks
 import balisurf.composeapp.generated.resources.reef_uluwatu
+import balisurf.composeapp.generated.resources.reef_caption
+import balisurf.composeapp.generated.resources.reef_content_description
+import balisurf.composeapp.generated.resources.section_did_it_work
+import balisurf.composeapp.generated.resources.section_next_24h
+import balisurf.composeapp.generated.resources.section_peak
+import balisurf.composeapp.generated.resources.section_reef
+import balisurf.composeapp.generated.resources.section_tides
+import balisurf.composeapp.generated.resources.tide_pill
+import balisurf.composeapp.generated.resources.tile_swell
+import balisurf.composeapp.generated.resources.tile_tide
+import balisurf.composeapp.generated.resources.tile_wind
+import balisurf.composeapp.generated.resources.tile_window
+import balisurf.composeapp.generated.resources.swell_sub
+import balisurf.composeapp.generated.resources.unit_kmh
+import balisurf.composeapp.generated.resources.unit_m
+import balisurf.composeapp.generated.resources.window_none
+import balisurf.composeapp.generated.resources.window_peak
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.pluralStringResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Spot detail: teal hero (name/verdict/headline), then white section cards —
  * 24h bars, peak-conditions tile grid, tide pills, reef bathymetry, notes —
- * with the session-log card last. Reuses the pure SpotScorer so the timeline
- * matches the list verdict.
+ * with the session-log card last. The tiles describe the verdict's own peak hour,
+ * so the detail read always matches the list verdict.
  */
 @Composable
 fun SpotDetailScreen(sf: SpotForecast, logs: SessionLogStore, onBack: () -> Unit) {
@@ -92,7 +118,7 @@ fun SpotDetailScreen(sf: SpotForecast, logs: SessionLogStore, onBack: () -> Unit
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 if (sf.hours.isNotEmpty()) {
-                    SectionCard("Next 24h") {
+                    SectionCard(stringResource(Res.string.section_next_24h)) {
                         HourBars(sf.spot, sf.hours, height = 80.dp)
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             val n = sf.hours.size
@@ -106,27 +132,40 @@ fun SpotDetailScreen(sf: SpotForecast, logs: SessionLogStore, onBack: () -> Unit
                 }
 
                 // Peak hour of the day = a representative read for the tiles + log snapshot.
-                val peak: Conditions? = sf.hours.maxByOrNull { SpotScorer.scoreHour(sf.spot, it) }
+                val peak: Conditions? = sf.verdict?.peak
                 peak?.let { c ->
-                    SectionCard("Peak conditions") {
+                    SectionCard(stringResource(Res.string.section_peak)) {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             ConditionTile(
-                                "Swell", "${fmt1(c.swellHeightMeters)} m",
-                                "${SpotScorer.compass(c.swellDirectionDeg)} @ ${c.swellPeriodSeconds.toInt()}s",
+                                stringResource(Res.string.tile_swell),
+                                stringResource(Res.string.unit_m, fmt1(c.swellHeightMeters)),
+                                stringResource(
+                                    Res.string.swell_sub,
+                                    compassLabel(c.swellDirectionDeg),
+                                    c.swellPeriodSeconds.toInt(),
+                                ),
                                 Modifier.weight(1f),
                             )
                             ConditionTile(
-                                "Wind", "${fmt1(c.windSpeedKmh)} km/h",
-                                SpotScorer.compass(c.windDirectionDeg), Modifier.weight(1f),
+                                stringResource(Res.string.tile_wind),
+                                stringResource(Res.string.unit_kmh, fmt1(c.windSpeedKmh)),
+                                compassLabel(c.windDirectionDeg), Modifier.weight(1f),
                             )
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            ConditionTile("Tide", c.tide.name, "${fmt1(c.tideHeightMeters)} m", Modifier.weight(1f))
-                            val w = sf.verdict?.bestWindow
                             ConditionTile(
-                                "Window",
-                                w?.let { "${hhmm(it.startIso)}–${hhmm(it.endIso)}" } ?: "—",
-                                w?.let { "peak ${it.peakStars}★" } ?: "no window",
+                                stringResource(Res.string.tile_tide),
+                                tideLabel(c.tide),
+                                stringResource(Res.string.unit_m, fmt1(c.tideHeightMeters)),
+                                Modifier.weight(1f),
+                            )
+                            val w = sf.verdict.bestWindow
+                            ConditionTile(
+                                stringResource(Res.string.tile_window),
+                                w?.let { "${hhmm(it.startIso)}–${hhmm(it.endIso)}" }
+                                    ?: stringResource(Res.string.dash),
+                                w?.let { stringResource(Res.string.window_peak, it.peakStars) }
+                                    ?: stringResource(Res.string.window_none),
                                 Modifier.weight(1f),
                             )
                         }
@@ -134,7 +173,7 @@ fun SpotDetailScreen(sf: SpotForecast, logs: SessionLogStore, onBack: () -> Unit
                 }
 
                 if (sf.tides.isNotEmpty()) {
-                    SectionCard("Tides") {
+                    SectionCard(stringResource(Res.string.section_tides)) {
                         @OptIn(ExperimentalLayoutApi::class)
                         FlowRow(
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -143,7 +182,10 @@ fun SpotDetailScreen(sf: SpotForecast, logs: SessionLogStore, onBack: () -> Unit
                             sf.tides.forEach { t ->
                                 val arrow = if (t.kind == TideEvent.Kind.HIGH) "▲" else "▼"
                                 Text(
-                                    "$arrow ${hhmm(t.timeIso)} · ${fmt1(t.heightMeters)} m",
+                                    stringResource(
+                                        Res.string.tide_pill,
+                                        arrow, hhmm(t.timeIso), fmt1(t.heightMeters),
+                                    ),
                                     Modifier.background(BaliColors.CardTint, RoundedCornerShape(50))
                                         .padding(horizontal = 10.dp, vertical = 5.dp),
                                     color = BaliColors.DeepTeal,
@@ -156,24 +198,25 @@ fun SpotDetailScreen(sf: SpotForecast, logs: SessionLogStore, onBack: () -> Unit
                 }
 
                 reefDrawable(sf.spot.id)?.let { res ->
-                    SectionCard("Reef · satellite bathymetry") {
+                    SectionCard(stringResource(Res.string.section_reef)) {
                         Image(
                             painter = painterResource(res),
-                            contentDescription = "${sf.spot.name} reef bathymetry",
+                            contentDescription = stringResource(
+                                Res.string.reef_content_description, sf.spot.name,
+                            ),
                             modifier = Modifier.fillMaxWidth().aspectRatio(1f),
                             contentScale = ContentScale.Fit,
                         )
                         Text(
-                            "Warm = shallow reef, cool = deep water. Derived from free Sentinel-2 " +
-                                "imagery (relative depth). Experimental.",
+                            stringResource(Res.string.reef_caption),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f),
                         )
                     }
                 }
 
-                if (sf.spot.notes.isNotBlank()) {
-                    Text(sf.spot.notes, style = MaterialTheme.typography.bodyMedium)
+                spotNotes(sf.spot.id)?.let {
+                    Text(it, style = MaterialTheme.typography.bodyMedium)
                 }
 
                 SessionLogCard(sf, logs, snapshot = peak)
@@ -192,7 +235,7 @@ private fun HeroHeader(sf: SpotForecast, onBack: () -> Unit) {
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
-            "‹ Spots",
+            stringResource(Res.string.back_to_spots),
             Modifier.clickable(onClick = onBack).padding(vertical = 4.dp),
             color = Color.White.copy(alpha = 0.85f),
             style = MaterialTheme.typography.labelLarge,
@@ -205,7 +248,7 @@ private fun HeroHeader(sf: SpotForecast, onBack: () -> Unit) {
         )
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                "${"★".repeat(stars)}${"☆".repeat(5 - stars)} · ${qualityBucket(stars).label}",
+                "${"★".repeat(stars)}${"☆".repeat(5 - stars)} · ${bucketLabel(stars).uppercase()}",
                 Modifier.background(Color.White, RoundedCornerShape(50))
                     .padding(horizontal = 10.dp, vertical = 4.dp),
                 color = BaliColors.DeepTeal,
@@ -214,14 +257,14 @@ private fun HeroHeader(sf: SpotForecast, onBack: () -> Unit) {
             )
             sf.verdict?.bestWindow?.let { w ->
                 Text(
-                    "Best ${hhmm(w.startIso)}–${hhmm(w.endIso)}",
+                    stringResource(Res.string.best_window, hhmm(w.startIso), hhmm(w.endIso)),
                     color = Color.White.copy(alpha = 0.9f),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
         }
         Text(
-            sf.verdict?.headline ?: "No forecast available",
+            verdictHeadline(sf.verdict),
             color = Color.White.copy(alpha = 0.9f),
             style = MaterialTheme.typography.bodyMedium,
         )
@@ -272,15 +315,15 @@ private fun SessionLogCard(sf: SpotForecast, logs: SessionLogStore, snapshot: Co
         justLogged = worked
     }
 
-    SectionCard("Did it work?", tint = BaliColors.CardTint) {
+    SectionCard(stringResource(Res.string.section_did_it_work), tint = BaliColors.CardTint) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Button(onClick = { log(true) }) { Text("👍 Worked") }
-            OutlinedButton(onClick = { log(false) }) { Text("👎 Didn't") }
+            Button(onClick = { log(true) }) { Text(stringResource(Res.string.log_worked)) }
+            OutlinedButton(onClick = { log(false) }) { Text(stringResource(Res.string.log_didnt)) }
         }
         val msg = when (justLogged) {
-            true -> "Logged — thanks. Your reports calibrate this spot."
-            false -> "Logged. Even a 'no' sharpens the forecast."
-            null -> "$count report${if (count == 1) "" else "s"} for ${sf.spot.name} so far."
+            true -> stringResource(Res.string.log_thanks_yes)
+            false -> stringResource(Res.string.log_thanks_no)
+            null -> pluralStringResource(Res.plurals.log_report_count, count, count, sf.spot.name)
         }
         Text(msg, style = MaterialTheme.typography.bodySmall)
     }
@@ -312,9 +355,4 @@ private fun reefDrawable(spotId: String): DrawableResource? = when (spotId) {
     "airportlefts" -> Res.drawable.reef_airportlefts
     "gerupuk" -> Res.drawable.reef_gerupuk
     else -> null
-}
-
-private fun fmt1(v: Double): String {
-    val r = (v * 10).toInt() / 10.0
-    return if (r == r.toInt().toDouble()) r.toInt().toString() else r.toString()
 }

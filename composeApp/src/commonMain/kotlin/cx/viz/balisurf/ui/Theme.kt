@@ -18,9 +18,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import balisurf.composeapp.generated.resources.Res
+import balisurf.composeapp.generated.resources.verdict_chip
 import cx.viz.balisurf.domain.Conditions
 import cx.viz.balisurf.domain.Spot
 import cx.viz.balisurf.scoring.SpotScorer
+import org.jetbrains.compose.resources.stringResource
 
 /** "Tropic Clean" palette — the app's only source of color constants. */
 object BaliColors {
@@ -52,14 +55,17 @@ private val TropicLight = lightColorScheme(
 fun BaliSurfTheme(content: @Composable () -> Unit) =
     MaterialTheme(colorScheme = TropicLight, content = content)
 
-/** Verdict bucket: one shared label+color mapping for chips, card accents, bars. */
-data class QualityBucket(val label: String, val container: Color, val content: Color)
+/**
+ * Verdict bucket: one shared color mapping for chips, card accents, bars. The
+ * matching label lives in [bucketLabel] because it is localized.
+ */
+data class QualityBucket(val container: Color, val content: Color)
 
 fun qualityBucket(stars: Int): QualityBucket = when {
-    stars <= 0 -> QualityBucket("FLAT", BaliColors.Gray, BaliColors.Ink)
-    stars <= 2 -> QualityBucket("POOR", BaliColors.Coral, Color.White)
-    stars == 3 -> QualityBucket("FAIR", BaliColors.Amber, Color.White)
-    else -> QualityBucket("GO", BaliColors.Teal, Color.White)
+    stars <= 0 -> QualityBucket(BaliColors.Gray, BaliColors.Ink)
+    stars <= 2 -> QualityBucket(BaliColors.Coral, Color.White)
+    stars == 3 -> QualityBucket(BaliColors.Amber, Color.White)
+    else -> QualityBucket(BaliColors.Teal, Color.White)
 }
 
 /** Bar-chart shading: light→dark teal ramp by stars (finer than the 4 buckets). */
@@ -77,7 +83,7 @@ fun barShade(stars: Int): Color = when (stars) {
 fun VerdictChip(stars: Int, modifier: Modifier = Modifier) {
     val b = qualityBucket(stars)
     Text(
-        "$stars★ ${b.label}",
+        stringResource(Res.string.verdict_chip, stars, bucketLabel(stars).uppercase()),
         modifier = modifier
             .background(b.container, RoundedCornerShape(50))
             .padding(horizontal = 10.dp, vertical = 3.dp),

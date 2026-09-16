@@ -7,6 +7,10 @@ import cx.viz.balisurf.domain.TideState
 /**
  * Bali surf spots with hand-set local rules, grouped by region.
  *
+ * Only language-free data lives here. The per-spot prose ("Bukit. Low-tide reef…")
+ * and the region labels are in composeResources/values/strings.xml (plus each
+ * values-<lang> sibling) as notes_<id> / region_<id>, resolved by ui/Strings.kt.
+ *
  * WARNING: these rule values are a STARTING POINT set from general local
  * knowledge, not gospel. They are the product's IP and must be refined with a
  * real surfer (Vladimir) + the session-log data against observed sessions. Every
@@ -38,7 +42,6 @@ object SpotCatalog {
                 offshoreWindMin = 90, offshoreWindMax = 135, // SE trade = offshore
                 maxWindSpeedKmh = 30.0,
             ),
-            notes = "Bukit. Works across the tide but sections change; big-swell magnet. Reef, strong current at the cave exit.",
         ),
         Spot(
             id = "padang",
@@ -53,7 +56,6 @@ object SpotCatalog {
                 offshoreWindMin = 90, offshoreWindMax = 135,
                 maxWindSpeedKmh = 25.0,
             ),
-            notes = "Bukit. The barrel. Needs a solid long-period swell and mid/high water to break properly; small = closeout on dry reef.",
         ),
         Spot(
             id = "bingin",
@@ -68,7 +70,6 @@ object SpotCatalog {
                 offshoreWindMin = 90, offshoreWindMax = 135,
                 maxWindSpeedKmh = 28.0,
             ),
-            notes = "Bukit. Low-tide reef. Shallow and sharp on dead low. Best on a pushing/dropping low to mid.",
         ),
         Spot(
             id = "impossibles",
@@ -83,7 +84,6 @@ object SpotCatalog {
                 offshoreWindMin = 90, offshoreWindMax = 135,
                 maxWindSpeedKmh = 28.0,
             ),
-            notes = "Bukit. Long walls between Padang and Bingin. Mid tide sweet spot; sections join up on the right swell.",
         ),
         Spot(
             id = "dreamland",
@@ -98,7 +98,6 @@ object SpotCatalog {
                 offshoreWindMin = 90, offshoreWindMax = 135,
                 maxWindSpeedKmh = 30.0,
             ),
-            notes = "Bukit. Beachy/reef mix, most tide-forgiving of the five. Good fallback when the reefs are too big or wrong tide.",
         ),
         Spot(
             id = "balangan",
@@ -113,7 +112,6 @@ object SpotCatalog {
                 offshoreWindMin = 90, offshoreWindMax = 135,
                 maxWindSpeedKmh = 28.0,
             ),
-            notes = "Bukit. Fast left reef, best low-to-mid. Drains out and gets shallow on dead low.",
         ),
         Spot(
             id = "greenbowl",
@@ -128,7 +126,6 @@ object SpotCatalog {
                 offshoreWindMin = 90, offshoreWindMax = 135,
                 maxWindSpeedKmh = 28.0,
             ),
-            notes = "South Bukit. Low-tide reef down a long stairway; picks up plenty of swell. Rights and lefts.",
         ),
 
         // ---- West coast (SW/W-facing beach + reef, E offshore) ----
@@ -145,7 +142,6 @@ object SpotCatalog {
                 offshoreWindMin = 45, offshoreWindMax = 110, // E/NE morning offshore
                 maxWindSpeedKmh = 28.0,
             ),
-            notes = "Canggu. Reef/beach peaks, punchy on a pushing low. Crowded; best early before the onshore fills in.",
         ),
         Spot(
             id = "batubolong",
@@ -160,7 +156,6 @@ object SpotCatalog {
                 offshoreWindMin = 45, offshoreWindMax = 110,
                 maxWindSpeedKmh = 26.0,
             ),
-            notes = "Canggu. Mellow longboard-friendly reef, best mid-to-high. The forgiving fallback of the west coast.",
         ),
         Spot(
             id = "medewi",
@@ -175,7 +170,6 @@ object SpotCatalog {
                 offshoreWindMin = 45, offshoreWindMax = 110,
                 maxWindSpeedKmh = 26.0,
             ),
-            notes = "Far west. Long mellow left point over rock/cobble, best mid-to-high on a solid long-period swell. Slow, forgiving wall.",
         ),
 
         // ---- East coast (E-facing reefs, W offshore, wet-season / morning) ----
@@ -192,7 +186,6 @@ object SpotCatalog {
                 offshoreWindMin = 250, offshoreWindMax = 290, // W offshore for the east coast
                 maxWindSpeedKmh = 26.0,
             ),
-            notes = "East coast. World-class right over black-sand reef; punchy and hollow. Best on a bigger long-period S/SE swell, morning offshore before the onshore trade. Wet-season favourite.",
         ),
         Spot(
             id = "nusadua",
@@ -207,7 +200,6 @@ object SpotCatalog {
                 offshoreWindMin = 250, offshoreWindMax = 290,
                 maxWindSpeedKmh = 26.0,
             ),
-            notes = "East coast. Big-wave reef that needs size to turn on; rights and lefts well offshore. Wet season / morning offshore, mid-to-high water.",
         ),
         Spot(
             id = "serangan",
@@ -222,7 +214,6 @@ object SpotCatalog {
                 offshoreWindMin = 250, offshoreWindMax = 290,
                 maxWindSpeedKmh = 28.0,
             ),
-            notes = "East coast (Serangan island). Consistent right reef, wet-season / morning offshore. More forgiving entry than Keramas.",
         ),
 
         // ---- More Bukit / south Kuta ----
@@ -239,7 +230,6 @@ object SpotCatalog {
                 offshoreWindMin = 90, offshoreWindMax = 135,
                 maxWindSpeedKmh = 28.0,
             ),
-            notes = "South Bukit. Remote, big-swell reef down a long hike; needs size and mid/high water. Emptier than the main Bukit spots.",
         ),
         Spot(
             id = "airportlefts",
@@ -254,7 +244,6 @@ object SpotCatalog {
                 offshoreWindMin = 90, offshoreWindMax = 140,
                 maxWindSpeedKmh = 26.0,
             ),
-            notes = "Kuta reef, off the airport runway (boat access). Long left, best mid/high on a solid long-period swell. SE offshore.",
         ),
 
         // ---- Nusa Lembongan (SW-facing reefs off SE Bali, SE offshore) ----
@@ -271,7 +260,6 @@ object SpotCatalog {
                 offshoreWindMin = 90, offshoreWindMax = 140,
                 maxWindSpeedKmh = 28.0,
             ),
-            notes = "Nusa Lembongan. Long right reef, best mid/high on a bigger long-period swell. SE offshore; boat/paddle access.",
         ),
         Spot(
             id = "playgrounds",
@@ -286,7 +274,6 @@ object SpotCatalog {
                 offshoreWindMin = 90, offshoreWindMax = 140,
                 maxWindSpeedKmh = 28.0,
             ),
-            notes = "Nusa Lembongan. Rights and lefts over reef, a touch more forgiving than Shipwrecks. Mid/high water, SE offshore.",
         ),
 
         // ---- Lombok (across the strait; south + SW coasts) ----
@@ -303,7 +290,6 @@ object SpotCatalog {
                 offshoreWindMin = 45, offshoreWindMax = 110, // E/NE offshore on SW Lombok
                 maxWindSpeedKmh = 25.0,
             ),
-            notes = "SW Lombok (Bangko Bangko). World-class barrelling left, fickle — needs a big long-period SW swell and low-to-mid water. Very shallow reef, serious wave.",
         ),
         Spot(
             id = "gerupuk",
@@ -318,7 +304,6 @@ object SpotCatalog {
                 offshoreWindMin = 315, offshoreWindMax = 45, // N-ish offshore in the bay
                 maxWindSpeedKmh = 28.0,
             ),
-            notes = "South Lombok. Several reefs in a bay (Insides/Outsides), boat access — a tide/wind option for most conditions. Takes S/SW swell.",
         ),
         Spot(
             id = "mawi",
@@ -333,7 +318,6 @@ object SpotCatalog {
                 offshoreWindMin = 315, offshoreWindMax = 45,
                 maxWindSpeedKmh = 26.0,
             ),
-            notes = "South Lombok. Powerful, hollow reef peak in a scenic bay; strong currents. Best low-to-mid on a solid S/SW swell.",
         ),
     )
 

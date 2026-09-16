@@ -26,6 +26,9 @@ jobs:
       - name: Guard committed reef rasters (no degenerate pSDB)
         run: python3 tools/sdb/test_overlays.py
 
+      - name: Guard translation coverage (every values-* covers values/)
+        run: python3 tools/check-strings.py
+
       - name: Run common unit tests (SpotScorer, TideClassifier)
         run: ./gradlew :composeApp:allTests --stacktrace
 

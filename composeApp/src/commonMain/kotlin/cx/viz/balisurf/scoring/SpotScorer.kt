@@ -95,7 +95,7 @@ object SpotScorer {
     /** Produce the full verdict for a spot across a day's hourly series. */
     fun verdict(spot: Spot, hours: List<Conditions>): Verdict {
         if (hours.isEmpty()) {
-            return Verdict(0, "No data", null, emptyList())
+            return Verdict(0, null, null, emptyList())
         }
         val scored = hours.map { it to scoreHour(spot, it) }
         // `hours` is non-empty (guarded above), so `scored` is too — use the
@@ -105,9 +105,8 @@ object SpotScorer {
         val stars = toStars(best.second)
 
         val window = bestWindow(scored)
-        val headline = headline(spot, best.first, stars)
         val factors = factorsFor(spot, best.first)
-        return Verdict(stars, headline, window, factors)
+        return Verdict(stars, best.first, window, factors)
     }
 
     // --- helpers ---
@@ -175,19 +174,6 @@ object SpotScorer {
         return TimeWindow(startIso, endIso, toStars(bestPeak))
     }
 
-    private fun headline(spot: Spot, c: Conditions, stars: Int): String {
-        val dir = compass(c.swellDirectionDeg)
-        val swell = "${fmt(c.swellHeightMeters)}m $dir ${c.swellPeriodSeconds.toInt()}s"
-        val tide = c.tide.name.lowercase()
-        return when (stars) {
-            0 -> "Flat / off — wrong tide or too small."
-            1, 2 -> "Marginal: $swell, $tide tide."
-            3 -> "Fun: $swell, $tide tide."
-            4 -> "Good: $swell, $tide tide — worth the paddle."
-            else -> "Firing: $swell, $tide tide."
-        }
-    }
-
     private fun factorsFor(spot: Spot, c: Conditions): List<Factor> {
         val r = spot.rules
         return listOf(
@@ -202,11 +188,12 @@ object SpotScorer {
         )
     }
 
-    internal fun compass(deg: Int): String {
-        val dirs = listOf("N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW")
-        val i = (((deg % 360) + 360) % 360 + 11) / 22 % 16
-        return dirs[i]
-    }
+    /** Index into the 16-point compass, N=0 clockwise. The UI maps it to a localized label. */
+    fun compassIndex(deg: Int): Int = (((deg % 360) + 360) % 360 + 11) / 22 % 16
+
+    /** English compass label — for factor detail strings and tests, not user-facing UI. */
+    internal fun compass(deg: Int): String =
+        listOf("N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW")[compassIndex(deg)]
 
     private fun fmt(v: Double): String {
         val r = (v * 10).toInt() / 10.0

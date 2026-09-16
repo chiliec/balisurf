@@ -20,7 +20,12 @@ data class Conditions(
 data class Verdict(
     /** 0..5, Windguru-style. */
     val stars: Int,
-    val headline: String,
+    /**
+     * The best-scoring hour of the series — the one the headline and the detail
+     * tiles describe. Held as data, not prose, so the UI can render it in the
+     * user's language; null only when there were no hours at all.
+     */
+    val peak: Conditions?,
     /** Best contiguous window today, or null if nothing scores. */
     val bestWindow: TimeWindow?,
     /** Per-factor breakdown, for the detail screen + debugging. */

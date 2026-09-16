@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <!-- Chrome -->
+    <string name="loading">Reading the ocean…</string>
+    <string name="attribution">Forecast data © Open-Meteo (CC BY 4.0). Tides are relative bands, not chart datum.</string>
+    <string name="no_forecast">No forecast available</string>
+    <string name="back_to_spots">‹ Spots</string>
+    <string name="best_window">Best %1$s–%2$s</string>
+
+    <!-- Section titles -->
+    <string name="section_next_24h">Next 24h</string>
+    <string name="section_peak">Peak conditions</string>
+    <string name="section_tides">Tides</string>
+    <string name="section_reef">Reef · satellite bathymetry</string>
+    <string name="section_did_it_work">Did it work?</string>
+
+    <!-- Condition tiles -->
+    <string name="tile_swell">Swell</string>
+    <string name="tile_wind">Wind</string>
+    <string name="tile_tide">Tide</string>
+    <string name="tile_window">Window</string>
+    <string name="unit_m">%1$s m</string>
+    <string name="unit_kmh">%1$s km/h</string>
+    <string name="swell_sub">%1$s @ %2$ds</string>
+    <string name="tide_pill">%1$s %2$s · %3$s m</string>
+    <string name="window_peak">peak %1$d★</string>
+    <string name="window_none">no window</string>
+    <string name="dash">—</string>
+
+    <!-- Reef -->
+    <string name="reef_caption">Warm = shallow reef, cool = deep water. Derived from free Sentinel-2 imagery (relative depth). Experimental.</string>
+    <string name="reef_content_description">%1$s reef bathymetry</string>
+
+    <!-- Session log -->
+    <string name="log_worked">👍 Worked</string>
+    <string name="log_didnt">👎 Didn\'t</string>
+    <string name="log_thanks_yes">Logged — thanks. Your reports calibrate this spot.</string>
+    <string name="log_thanks_no">Logged. Even a \'no\' sharpens the forecast.</string>
+    <plurals name="log_report_count">
+        <item quantity="one">%1$d report for %2$s so far.</item>
+        <item quantity="other">%1$d reports for %2$s so far.</item>
+    </plurals>
+
+    <!-- Verdict buckets + headlines -->
+    <string name="bucket_flat">Flat</string>
+    <string name="bucket_poor">Poor</string>
+    <string name="bucket_fair">Fair</string>
+    <string name="bucket_go">Go</string>
+    <string name="verdict_chip">%1$d★ %2$s</string>
+    <string name="swell_summary">%1$sm %2$s %3$ds</string>
+    <string name="headline_flat">Flat / off — wrong tide or too small.</string>
+    <string name="headline_marginal">Marginal: %1$s, %2$s tide.</string>
+    <string name="headline_fun">Fun: %1$s, %2$s tide.</string>
+    <string name="headline_good">Good: %1$s, %2$s tide — worth the paddle.</string>
+    <string name="headline_firing">Firing: %1$s, %2$s tide.</string>
+
+    <!-- Tide states -->
+    <string name="tide_low">Low</string>
+    <string name="tide_mid">Mid</string>
+    <string name="tide_high">High</string>
+
+    <!-- Regions (keys match Spot.region ids in SpotCatalog) -->
+    <string name="region_bukit">Bukit</string>
+    <string name="region_kuta">Kuta</string>
+    <string name="region_west_coast">West Coast</string>
+    <string name="region_east_coast">East Coast</string>
+    <string name="region_nusa_lembongan">Nusa Lembongan</string>
+    <string name="region_lombok">Lombok</string>
+
+    <!-- Per-spot local knowledge. These are the product's IP: hand-written, not generated. -->
+    <string name="notes_uluwatu">Bukit. Works across the tide but sections change; big-swell magnet. Reef, strong current at the cave exit.</string>
+    <string name="notes_padang">Bukit. The barrel. Needs a solid long-period swell and mid/high water to break properly; small = closeout on dry reef.</string>
+    <string name="notes_bingin">Bukit. Low-tide reef. Shallow and sharp on dead low. Best on a pushing/dropping low to mid.</string>
+    <string name="notes_impossibles">Bukit. Long walls between Padang and Bingin. Mid tide sweet spot; sections join up on the right swell.</string>
+    <string name="notes_dreamland">Bukit. Beachy/reef mix, most tide-forgiving of the five. Good fallback when the reefs are too big or wrong tide.</string>
+    <string name="notes_balangan">Bukit. Fast left reef, best low-to-mid. Drains out and gets shallow on dead low.</string>
+    <string name="notes_greenbowl">South Bukit. Low-tide reef down a long stairway; picks up plenty of swell. Rights and lefts.</string>
+    <string name="notes_nyangnyang">South Bukit. Remote, big-swell reef down a long hike; needs size and mid/high water. Emptier than the main Bukit spots.</string>
+    <string name="notes_canggu">Canggu. Reef/beach peaks, punchy on a pushing low. Crowded; best early before the onshore fills in.</string>
+    <string name="notes_batubolong">Canggu. Mellow longboard-friendly reef, best mid-to-high. The forgiving fallback of the west coast.</string>
+    <string name="notes_medewi">Far west. Long mellow left point over rock/cobble, best mid-to-high on a solid long-period swell. Slow, forgiving wall.</string>
+    <string name="notes_keramas">East coast. World-class right over black-sand reef; punchy and hollow. Best on a bigger long-period S/SE swell, morning offshore before the onshore trade. Wet-season favourite.</string>
+    <string name="notes_nusadua">East coast. Big-wave reef that needs size to turn on; rights and lefts well offshore. Wet season / morning offshore, mid-to-high water.</string>
+    <string name="notes_serangan">East coast (Serangan island). Consistent right reef, wet-season / morning offshore. More forgiving entry than Keramas.</string>
+    <string name="notes_airportlefts">Kuta reef, off the airport runway (boat access). Long left, best mid/high on a solid long-period swell. SE offshore.</string>
+    <string name="notes_shipwrecks">Nusa Lembongan. Long right reef, best mid/high on a bigger long-period swell. SE offshore; boat/paddle access.</string>
+    <string name="notes_playgrounds">Nusa Lembongan. Rights and lefts over reef, a touch more forgiving than Shipwrecks. Mid/high water, SE offshore.</string>
+    <string name="notes_desertpoint">SW Lombok (Bangko Bangko). World-class barrelling left, fickle — needs a big long-period SW swell and low-to-mid water. Very shallow reef, serious wave.</string>
+    <string name="notes_gerupuk">South Lombok. Several reefs in a bay (Insides/Outsides), boat access — a tide/wind option for most conditions. Takes S/SW swell.</string>
+    <string name="notes_mawi">South Lombok. Powerful, hollow reef peak in a scenic bay; strong currents. Best low-to-mid on a solid S/SW swell.</string>
+
+    <!-- 16-point compass, indexed by SpotScorer.compassIndex(). Order must not change. -->
+    <string-array name="compass">
+        <item>N</item><item>NNE</item><item>NE</item><item>ENE</item>
+        <item>E</item><item>ESE</item><item>SE</item><item>SSE</item>
+        <item>S</item><item>SSW</item><item>SW</item><item>WSW</item>
+        <item>W</item><item>WNW</item><item>NW</item><item>NNW</item>
+    </string-array>
+
+    <!-- Indexed by DayOfWeek / Month ordinal (Monday-first, January-first). -->
+    <string-array name="weekdays_short">
+        <item>Mon</item><item>Tue</item><item>Wed</item><item>Thu</item>
+        <item>Fri</item><item>Sat</item><item>Sun</item>
+    </string-array>
+    <string-array name="months_short">
+        <item>Jan</item><item>Feb</item><item>Mar</item><item>Apr</item>
+        <item>May</item><item>Jun</item><item>Jul</item><item>Aug</item>
+        <item>Sep</item><item>Oct</item><item>Nov</item><item>Dec</item>
+    </string-array>
+    <string name="header_date">%1$s %2$d %3$s</string>
+</resources>

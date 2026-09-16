@@ -3,19 +3,10 @@ package cx.viz.balisurf.ui
 import androidx.compose.ui.graphics.Color
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 /** Pins the stars→bucket mapping every chip, accent border, and bar chart uses. */
 class QualityBucketTest {
-
-    @Test
-    fun bucketsMapStarsToLabels() {
-        assertEquals("FLAT", qualityBucket(0).label)
-        assertEquals("POOR", qualityBucket(1).label)
-        assertEquals("POOR", qualityBucket(2).label)
-        assertEquals("FAIR", qualityBucket(3).label)
-        assertEquals("GO", qualityBucket(4).label)
-        assertEquals("GO", qualityBucket(5).label)
-    }
 
     @Test
     fun bucketColorsComeFromThePalette() {
@@ -34,13 +25,14 @@ class QualityBucketTest {
     }
 
     @Test
-    fun headerDateFormatsIsoHour() {
+    fun dateParts_indexTheLocalizedWeekdayAndMonthArrays() {
         // 2000-01-01 was a Saturday — a date whose weekday is beyond doubt.
-        assertEquals("Sat 1 Jan", headerDate("2000-01-01T00:00"))
+        // Monday-first weekdays => Saturday is 5; January is month 0.
+        assertEquals(Triple(5, 1, 0), dateParts("2000-01-01T00:00"))
     }
 
     @Test
-    fun headerDateSwallowsGarbage() {
-        assertEquals("", headerDate("not-a-date"))
+    fun dateParts_swallowGarbage() {
+        assertNull(dateParts("not-a-date"))
     }
 }

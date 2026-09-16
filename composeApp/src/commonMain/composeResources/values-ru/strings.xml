@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <!-- Chrome -->
+    <string name="loading">Читаем океан…</string>
+    <string name="attribution">Данные прогноза © Open-Meteo (CC BY 4.0). Прилив показан относительными уровнями, а не от нуля карты.</string>
+    <string name="no_forecast">Прогноза нет</string>
+    <string name="back_to_spots">‹ Споты</string>
+    <string name="best_window">Лучше всего %1$s–%2$s</string>
+
+    <!-- Section titles -->
+    <string name="section_next_24h">Ближайшие 24 ч</string>
+    <string name="section_peak">Лучший час</string>
+    <string name="section_tides">Приливы</string>
+    <string name="section_reef">Риф · спутниковая батиметрия</string>
+    <string name="section_did_it_work">Как покаталось?</string>
+
+    <!-- Condition tiles -->
+    <string name="tile_swell">Свелл</string>
+    <string name="tile_wind">Ветер</string>
+    <string name="tile_tide">Прилив</string>
+    <string name="tile_window">Окно</string>
+    <string name="unit_m">%1$s м</string>
+    <string name="unit_kmh">%1$s км/ч</string>
+    <string name="swell_sub">%1$s @ %2$d с</string>
+    <string name="tide_pill">%1$s %2$s · %3$s м</string>
+    <string name="window_peak">пик %1$d★</string>
+    <string name="window_none">окна нет</string>
+    <string name="dash">—</string>
+
+    <!-- Reef -->
+    <string name="reef_caption">Тёплые тона — мелкий риф, холодные — глубина. Построено по бесплатным снимкам Sentinel-2 (относительная глубина). Экспериментально.</string>
+    <string name="reef_content_description">Батиметрия рифа: %1$s</string>
+
+    <!-- Session log -->
+    <string name="log_worked">👍 Зашло</string>
+    <string name="log_didnt">👎 Не зашло</string>
+    <string name="log_thanks_yes">Записали — спасибо. Ваши отчёты калибруют этот спот.</string>
+    <string name="log_thanks_no">Записали. Даже «не зашло» уточняет прогноз.</string>
+    <plurals name="log_report_count">
+        <item quantity="one">%1$d отчёт по споту %2$s.</item>
+        <item quantity="few">%1$d отчёта по споту %2$s.</item>
+        <item quantity="many">%1$d отчётов по споту %2$s.</item>
+        <item quantity="other">%1$d отчёта по споту %2$s.</item>
+    </plurals>
+
+    <!-- Verdict buckets + headlines -->
+    <string name="bucket_flat">Штиль</string>
+    <string name="bucket_poor">Слабо</string>
+    <string name="bucket_fair">Норм</string>
+    <string name="bucket_go">Едем</string>
+    <string name="verdict_chip">%1$d★ %2$s</string>
+    <string name="swell_summary">%1$s м %2$s %3$d с</string>
+    <string name="headline_flat">Плоско — не та фаза прилива или слишком мелкий свелл.</string>
+    <string name="headline_marginal">На троечку: %1$s, %2$s вода.</string>
+    <string name="headline_fun">Покататься можно: %1$s, %2$s вода.</string>
+    <string name="headline_good">Хорошо: %1$s, %2$s вода — стоит грести.</string>
+    <string name="headline_firing">Жарит: %1$s, %2$s вода.</string>
+
+    <!-- Tide states -->
+    <string name="tide_low">Малая</string>
+    <string name="tide_mid">Средняя</string>
+    <string name="tide_high">Полная</string>
+
+    <!-- Regions -->
+    <string name="region_bukit">Букит</string>
+    <string name="region_kuta">Кута</string>
+    <string name="region_west_coast">Западное побережье</string>
+    <string name="region_east_coast">Восточное побережье</string>
+    <string name="region_nusa_lembongan">Нуса Лембонган</string>
+    <string name="region_lombok">Ломбок</string>
+
+    <!-- Per-spot local knowledge -->
+    <string name="notes_uluwatu">Букит. Работает на любой фазе прилива, но секции меняются; магнит для крупного свелла. Риф, сильное течение на выходе из пещеры.</string>
+    <string name="notes_padang">Букит. Та самая труба. Нужен плотный длиннопериодный свелл и средняя/полная вода; на маленьком — заваливается на сухой риф.</string>
+    <string name="notes_bingin">Букит. Риф на малой воде. На самом отливе мелко и остро. Лучше всего на растущей/падающей воде от малой к средней.</string>
+    <string name="notes_impossibles">Букит. Длинные стенки между Падангом и Бингином. Идеально на средней воде; на правильном свелле секции соединяются.</string>
+    <string name="notes_dreamland">Букит. Смесь пляжа и рифа, самый терпимый к приливу из пятёрки. Хороший запасной вариант, когда на рифах слишком крупно или не та вода.</string>
+    <string name="notes_balangan">Букит. Быстрый левый риф, лучше всего от малой до средней воды. На полном отливе осушается и становится мелко.</string>
+    <string name="notes_greenbowl">Южный Букит. Риф на малой воде, вниз по длинной лестнице; ловит много свелла. Есть и правые, и левые.</string>
+    <string name="notes_nyangnyang">Южный Букит. Удалённый риф под крупный свелл, идти далеко пешком; нужен размер и средняя/полная вода. Пустее основных спотов Букита.</string>
+    <string name="notes_canggu">Чангу. Рифовые и пляжные пики, забористо на растущей малой воде. Людно; лучше рано утром, пока не задул оншор.</string>
+    <string name="notes_batubolong">Чангу. Мягкий лонгбордовый риф, лучше от средней до полной воды. Прощающий запасной вариант западного побережья.</string>
+    <string name="notes_medewi">Дальний запад. Длинный спокойный левый поинт по камням, лучше от средней до полной воды на плотном длиннопериодном свелле. Медленная, прощающая стенка.</string>
+    <string name="notes_keramas">Восточное побережье. Правая мирового уровня по рифу с чёрным песком; мощная и полая. Лучше на крупном длиннопериодном свелле с Ю/ЮВ, утром до прихода оншора. Фаворит влажного сезона.</string>
+    <string name="notes_nusadua">Восточное побережье. Биг-вейв риф, включается только на размере; правые и левые далеко от берега. Влажный сезон / утренний офшор, средняя-полная вода.</string>
+    <string name="notes_serangan">Восточное побережье (остров Серанган). Стабильный правый риф, влажный сезон / утренний офшор. Заход проще, чем на Керамасе.</string>
+    <string name="notes_airportlefts">Риф Куты у полосы аэропорта (заход на лодке). Длинная левая, лучше на средней/полной воде и плотном длиннопериодном свелле. Офшор с ЮВ.</string>
+    <string name="notes_shipwrecks">Нуса Лембонган. Длинный правый риф, лучше на средней/полной воде и крупном длиннопериодном свелле. Офшор с ЮВ; заход на лодке или вгребать.</string>
+    <string name="notes_playgrounds">Нуса Лембонган. Правые и левые по рифу, чуть более прощающий, чем Shipwrecks. Средняя/полная вода, офшор с ЮВ.</string>
+    <string name="notes_desertpoint">Юго-запад Ломбока (Бангко-Бангко). Левая труба мирового уровня, капризная — нужен крупный длиннопериодный свелл с ЮЗ и вода от малой до средней. Очень мелкий риф, серьёзная волна.</string>
+    <string name="notes_gerupuk">Южный Ломбок. Несколько рифов в бухте (Insides/Outsides), заход на лодке — вариант почти под любой прилив и ветер. Принимает свелл с Ю/ЮЗ.</string>
+    <string name="notes_mawi">Южный Ломбок. Мощный полый рифовый пик в живописной бухте; сильные течения. Лучше от малой до средней воды на плотном свелле с Ю/ЮЗ.</string>
+
+    <!-- 16-point compass, indexed by SpotScorer.compassIndex(). Order must not change. -->
+    <string-array name="compass">
+        <item>С</item><item>ССВ</item><item>СВ</item><item>ВСВ</item>
+        <item>В</item><item>ВЮВ</item><item>ЮВ</item><item>ЮЮВ</item>
+        <item>Ю</item><item>ЮЮЗ</item><item>ЮЗ</item><item>ЗЮЗ</item>
+        <item>З</item><item>ЗСЗ</item><item>СЗ</item><item>ССЗ</item>
+    </string-array>
+
+    <string-array name="weekdays_short">
+        <item>Пн</item><item>Вт</item><item>Ср</item><item>Чт</item>
+        <item>Пт</item><item>Сб</item><item>Вс</item>
+    </string-array>
+    <string-array name="months_short">
+        <item>янв</item><item>фев</item><item>мар</item><item>апр</item>
+        <item>мая</item><item>июн</item><item>июл</item><item>авг</item>
+        <item>сен</item><item>окт</item><item>ноя</item><item>дек</item>
+    </string-array>
+    <string name="header_date">%1$s, %2$d %3$s</string>
+</resources>

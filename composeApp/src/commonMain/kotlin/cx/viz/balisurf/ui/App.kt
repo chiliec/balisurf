@@ -32,8 +32,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import balisurf.composeapp.generated.resources.Res
+import balisurf.composeapp.generated.resources.attribution
+import balisurf.composeapp.generated.resources.best_window
+import balisurf.composeapp.generated.resources.loading
 import cx.viz.balisurf.domain.TideEvent
-import kotlinx.datetime.LocalDate
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * MVP UI: a list screen of the catalog spots grouped by region; tapping one opens
@@ -69,7 +73,7 @@ fun App(module: AppModule) = BaliSurfTheme {
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 CircularProgressIndicator()
-                Text("Reading the ocean…", Modifier.padding(top = 12.dp))
+                Text(stringResource(Res.string.loading), Modifier.padding(top = 12.dp))
             }
         } else {
             // Group by region, preserving catalog order.
@@ -99,7 +103,7 @@ fun App(module: AppModule) = BaliSurfTheme {
                 }
                 grouped.forEach { (region, spots) ->
                     item(key = "hdr-$region") {
-                        SectionLabel(region, Modifier.padding(top = 14.dp, bottom = 2.dp))
+                        SectionLabel(regionLabel(region), Modifier.padding(top = 14.dp, bottom = 2.dp))
                     }
                     items(spots, key = { it.spot.id }) { sf ->
                         SpotCard(sf, onClick = { selectedId = sf.spot.id })
@@ -107,7 +111,7 @@ fun App(module: AppModule) = BaliSurfTheme {
                 }
                 item {
                     Text(
-                        "Forecast data © Open-Meteo (CC BY 4.0). Tides are relative bands, not chart datum.",
+                        stringResource(Res.string.attribution),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                         modifier = Modifier.padding(top = 12.dp),
@@ -143,12 +147,15 @@ private fun SpotCard(sf: SpotForecast, onClick: () -> Unit) {
                     )
                     VerdictChip(stars)
                 }
-                Text(sf.verdict?.headline ?: "No forecast available", style = MaterialTheme.typography.bodyMedium)
+                Text(verdictHeadline(sf.verdict), style = MaterialTheme.typography.bodyMedium)
                 if (sf.hours.isNotEmpty()) {
                     HourBars(sf.spot, sf.hours, height = 24.dp)
                 }
+                val bestLabel = sf.verdict?.bestWindow?.let {
+                    stringResource(Res.string.best_window, hhmm(it.startIso), hhmm(it.endIso))
+                }
                 val meta = buildList {
-                    sf.verdict?.bestWindow?.let { add("Best ${hhmm(it.startIso)}–${hhmm(it.endIso)}") }
+                    bestLabel?.let { add(it) }
                     if (sf.tides.isNotEmpty()) {
                         add(sf.tides.joinToString("  ") {
                             "${if (it.kind == TideEvent.Kind.HIGH) "▲" else "▼"} ${hhmm(it.timeIso)}"
@@ -169,10 +176,3 @@ private fun SpotCard(sf: SpotForecast, onClick: () -> Unit) {
 
 /** "2026-08-15T07:00" -> "07:00". Shared with the detail screen. */
 internal fun hhmm(iso: String): String = iso.substringAfter('T').take(5)
-
-/** "2026-08-20T07:00" -> "Wed 20 Aug" — header date from forecast data, no platform clock. */
-internal fun headerDate(iso: String): String = runCatching {
-    val d = LocalDate.parse(iso.substringBefore('T'))
-    fun cap(s: String) = s.lowercase().replaceFirstChar { it.uppercase() }
-    "${cap(d.dayOfWeek.name).take(3)} ${d.dayOfMonth} ${cap(d.month.name).take(3)}"
-}.getOrDefault("")
