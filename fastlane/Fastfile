@@ -224,20 +224,25 @@ platform :ios do
     # the release docs). deliver wants a <lang>/ tree and classifies each shot by
     # its pixel size, so stage copies into a gitignored dir each run — the single
     # source of truth stays in store-assets/.
+    # Every locale in the metadata tree gets the same set: ASC wants screenshots
+    # per localization, and the captioned shots are shared across languages.
     src   = File.expand_path("../store-assets/screenshots/ios", __dir__)
+    meta  = File.expand_path("../store-assets/metadata/ios", __dir__)
     root  = File.expand_path("screenshots", __dir__)
-    lang  = File.join(root, "en-US")
     shots = Dir[File.join(src, "*.png")]
     UI.user_error!("No screenshots in #{src} — capture them first") if shots.empty?
     FileUtils.rm_rf(root)
-    FileUtils.mkdir_p(lang)
-    FileUtils.cp(shots, lang)
+    Dir[File.join(meta, "*", "description.txt")].each do |d|
+      lang = File.join(root, File.basename(File.dirname(d)))
+      FileUtils.mkdir_p(lang)
+      FileUtils.cp(shots, lang)
+    end
 
     upload_to_app_store(
       api_key: api_key,
       app_identifier: APP_IDENTIFIER,
       app_version: APP_VERSION,
-      metadata_path: File.expand_path("../store-assets/metadata/ios", __dir__),
+      metadata_path: meta,
       screenshots_path: root,
       skip_binary_upload: true,        # build already on TestFlight (beta lane)
       overwrite_screenshots: true,
