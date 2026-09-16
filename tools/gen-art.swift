@@ -5,7 +5,8 @@
 //   swift tools/gen-art.swift
 //
 // Outputs: androidMain mipmaps (adaptive foreground + legacy + round),
-// store-assets/icons/play-icon-512.png, store-assets/feature-graphic/*.png.
+// iOS AppIcon 1024, store-assets/icons/play-icon-512.png,
+// store-assets/feature-graphic/*.png.
 // Re-run after a palette change; the mark is code, not a binary to hand-edit.
 
 import Foundation
@@ -22,9 +23,11 @@ let sand = CGColor(red: 0xF7 / 255, green: 0xFA / 255, blue: 0xFB / 255, alpha: 
 
 let space = CGColorSpaceCreateDeviceRGB()
 
-func ctx(_ w: Int, _ h: Int) -> CGContext {
+func ctx(_ w: Int, _ h: Int, opaque: Bool = false) -> CGContext {
+    // Store icons (App Store 1024, Play 512) must carry no alpha channel at all.
+    let alpha: CGImageAlphaInfo = opaque ? .noneSkipLast : .premultipliedLast
     let c = CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: 0,
-                      space: space, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+                      space: space, bitmapInfo: alpha.rawValue)!
     c.setAllowsAntialiasing(true)
     return c
 }
@@ -150,9 +153,61 @@ for (bucket, adaptive, legacy) in densities {
 }
 
 // --- Play listing -----------------------------------------------------------
-// Play's 512 icon must be square and fully opaque; it applies its own mask.
-let playIcon = ctx(512, 512)
+// Play's 512 icon must be square with no alpha channel; it applies its own mask.
+let playIcon = ctx(512, 512, opaque: true)
 fillGradient(playIcon, CGRect(x: 0, y: 0, width: 512, height: 512))
 drawWaves(playIcon, size: 512 * 0.72, origin: CGPoint(x: 512 * 0.14, y: 512 * 0.14), color: white)
 write(playIcon, "store-assets/icons/play-icon-512.png")
+
+// --- iOS AppIcon ------------------------------------------------------------
+// The lettered mark: BALI / SURF over a crest arc. Its own navy + sand palette,
+// kept from the original hand-made icon. Cap top of BALI and the arc's cut ends
+// both sit `inset` from the canvas edge; the arc never crosses the letters.
+let navyTop = CGColor(red: 0x0A / 255, green: 0x6D / 255, blue: 0x98 / 255, alpha: 1)
+let navyBottom = CGColor(red: 0x07 / 255, green: 0x3C / 255, blue: 0x5A / 255, alpha: 1)
+let sandInk = CGColor(red: 0xF0 / 255, green: 0xE4 / 255, blue: 0xC8 / 255, alpha: 1)
+
+/// Draws `string` centred horizontally with its glyph cap top at `capTop` (from the top edge).
+func centredText(_ c: CGContext, _ string: String, size: CGFloat, capTop: CGFloat) {
+    let f = CTFontCreateWithName("HelveticaNeue-Bold" as CFString, size, nil)
+    let attrs: [CFString: Any] = [kCTFontAttributeName: f, kCTForegroundColorAttributeName: sandInk,
+                                  kCTKernAttributeName: size * 0.01]
+    let line = CTLineCreateWithAttributedString(
+        CFAttributedStringCreate(nil, string as CFString, attrs as CFDictionary))
+    let ink = CTLineGetBoundsWithOptions(line, [.useGlyphPathBounds])
+    let s = CGFloat(c.width)
+    c.textPosition = CGPoint(x: (s - ink.width) / 2 - ink.minX, y: s - capTop - ink.maxY)
+    CTLineDraw(line, c)
+}
+
+func iosIcon(_ px: Int) -> CGContext {
+    let c = ctx(px, px, opaque: true)
+    let s = CGFloat(px)
+    let g = CGGradient(colorsSpace: space, colors: [navyTop, navyBottom] as CFArray, locations: [0, 1])!
+    c.drawLinearGradient(g, start: CGPoint(x: 0, y: s), end: CGPoint(x: 0, y: 0), options: [])
+
+    let inset = s * 0.225
+    let fontSize = s * 0.1875
+    centredText(c, "BALI", size: fontSize, capTop: inset)
+    centredText(c, "SURF", size: fontSize, capTop: inset + fontSize * 0.965)
+
+    // Crest: a circular arc whose outer top clears SURF and whose ends are cut
+    // flat at `inset` from the bottom. Centre sits below the canvas.
+    let stroke = s * 0.05
+    let arcTop = inset + fontSize * 1.93 + s * 0.035   // outer edge, from top
+    let halfWidth = s * 0.358                            // outer half-width at the cut
+    let height = s - inset - arcTop                      // outer top -> cut line
+    let outerR = (halfWidth * halfWidth + height * height) / (2 * height)
+    let centre = CGPoint(x: s / 2, y: s - (arcTop + outerR))
+    c.saveGState()
+    c.clip(to: CGRect(x: 0, y: inset, width: s, height: s - inset))
+    c.setStrokeColor(sandInk)
+    c.setLineWidth(stroke)
+    c.setLineCap(.butt)
+    c.addArc(center: centre, radius: outerR - stroke / 2, startAngle: .pi * 0.1, endAngle: .pi * 0.9, clockwise: false)
+    c.strokePath()
+    c.restoreGState()
+    return c
+}
+write(iosIcon(1024), "iosApp/iosApp/Assets.xcassets/AppIcon.appiconset/icon-1024.png")
 write(featureGraphic(), "store-assets/feature-graphic/play-feature-1024x500.png")
