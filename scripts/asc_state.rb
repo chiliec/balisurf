@@ -50,6 +50,22 @@ if versions.is_a?(Hash) && versions["data"]
     puts "\n== Build attached to version =="
     c, b = get("/v1/appStoreVersions/#{vid}/build")
     puts "HTTP #{c}  #{b.is_a?(Hash) && b['data'] ? b['data']['id'] : b.inspect[0, 200]}"
+
+    # Screenshots per localization. Flags the deliver bug where a retried upload
+    # leaves a second copy of every file (identical checksums) in the set.
+    puts "\n== Screenshots per locale (#{VERSION}) =="
+    _, locs = get("/v1/appStoreVersions/#{vid}/appStoreVersionLocalizations")
+    (locs.is_a?(Hash) ? locs["data"] : []).to_a.each do |loc|
+      _, sets = get("/v1/appStoreVersionLocalizations/#{loc['id']}/appScreenshotSets")
+      (sets.is_a?(Hash) ? sets["data"] : []).to_a.each do |set|
+        _, shots = get("/v1/appScreenshotSets/#{set['id']}/appScreenshots")
+        names = (shots.is_a?(Hash) ? shots["data"] : []).to_a.map { |s| s["attributes"]["fileName"] }
+        dupes = names.group_by { |n| n }.select { |_, v| v.size > 1 }.keys
+        flag = dupes.empty? ? "" : "  <- DUPLICATED: #{dupes.join(', ')}"
+        puts "  #{loc['attributes']['locale']} #{set['attributes']['screenshotDisplayType']}: " \
+             "#{names.size} #{names.sort.inspect}#{flag}"
+      end
+    end
   end
 end
 

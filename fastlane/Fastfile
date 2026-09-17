@@ -220,6 +220,9 @@ platform :ios do
   lane :release do
     api_key = asc_api_key
 
+    # sync_screenshots (below) is gated behind this flag by fastlane itself.
+    ENV["FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS"] = "1"
+
     # Screenshots live canonically under store-assets/screenshots/ios/<locale>/ —
     # the captions are burned into the image, so every locale needs its own set.
     # deliver wants a <lang>/ tree and classifies each shot by its pixel size, so
@@ -246,7 +249,16 @@ platform :ios do
       metadata_path: meta,
       screenshots_path: root,
       skip_binary_upload: true,        # build already on TestFlight (beta lane)
-      overwrite_screenshots: true,
+      # sync, NOT overwrite_screenshots: with overwrite, deliver's verify pass
+      # regularly reports a just-uploaded shot as "missing on App Store Connect"
+      # (ASC processes them asynchronously), retries, and uploads a SECOND copy of
+      # every file without deleting the first — 6 screenshots per locale, identical
+      # checksums, seen on both 2026-09-17 runs. sync diffs local against remote by
+      # checksum, deletes the failures before retrying, and sorts the set, so it is
+      # idempotent. Still flagged beta by fastlane, hence the env var above; if it
+      # ever breaks, fall back to overwrite_screenshots: true and delete the
+      # duplicates by hand (scripts/asc_state.rb prints the per-locale counts).
+      sync_screenshots: true,
       submit_for_review: false,        # PREPARE ONLY — submit via the submit lane
       automatic_release: false,
       precheck_include_in_app_purchases: false,
