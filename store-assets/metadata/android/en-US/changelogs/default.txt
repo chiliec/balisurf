@@ -1,1 +1,1 @@
-Fixes the spot screen, where cards could scroll up behind the status bar and sit under the clock.
+The app is now fully available in Russian — spot verdicts, tides, wind and reef notes follow your device language.

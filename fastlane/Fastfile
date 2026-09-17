@@ -69,7 +69,7 @@ XCODEPROJ = File.expand_path("../iosApp/iosApp.xcodeproj", __dir__)
 SCHEME    = ENV.fetch("IOS_SCHEME", "iosApp")
 # Marketing version the release/submit lanes operate on. Keep in sync with
 # MARKETING_VERSION in the Xcode project.
-APP_VERSION = ENV.fetch("APP_VERSION", "1.0.2")
+APP_VERSION = ENV.fetch("APP_VERSION", "1.0.3")
 # setup_ci creates this keychain on CI; import_certificate must target it.
 CI_KEYCHAIN = "fastlane_tmp_keychain"
 
