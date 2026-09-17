@@ -35,3 +35,4 @@ build/ios/
 __pycache__/
 *.pyc
 .superpowers/
+*.mobileprovision
