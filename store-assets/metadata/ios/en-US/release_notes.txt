@@ -1,1 +1,1 @@
-The app is now fully available in Russian — spot verdicts, tides, wind and reef notes follow your device language.
+Anonymous usage analytics: the app now reports which screens are opened (screen name, app and OS version, device model — no identifiers, no session logs, no coordinates) to our own self-hosted Umami, so we can see which features matter. Forecasts and your session log still never leave the device. Privacy policy updated.
