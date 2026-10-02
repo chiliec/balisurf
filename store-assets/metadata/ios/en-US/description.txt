@@ -15,4 +15,4 @@ Also inside:
 • Verdicts in words: "Firing", "Fun", "Wrong tide".
 • Log whether a spot actually worked. Your reports tune the spot rules.
 
-No account, no ads, no tracking, nothing collected. Forecast data is free public data from Open-Meteo (CC BY 4.0).
+No account, no ads, no tracking. Only anonymous screen-view analytics (no identifiers) on our own server. Forecast data is free public data from Open-Meteo (CC BY 4.0).

@@ -37,6 +37,7 @@ import balisurf.composeapp.generated.resources.attribution
 import balisurf.composeapp.generated.resources.best_window
 import balisurf.composeapp.generated.resources.loading
 import cx.viz.balisurf.domain.TideEvent
+import cx.viz.balisurf.platform.Analytics
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -52,6 +53,7 @@ fun App(module: AppModule) = BaliSurfTheme {
     LaunchedEffect(Unit) {
         state = module.loadAll()
     }
+    LaunchedEffect(selectedId) { Analytics.screen(selectedId?.let { "spot/$it" } ?: "spots") }
 
     val data = state
     val selected = data?.firstOrNull { it.spot.id == selectedId }
