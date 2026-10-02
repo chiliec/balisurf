@@ -25,10 +25,14 @@ deliver refuses to submit until all of these are set. Run the scripts with
   Copernicus Sentinel-derived reef overlays). DONE.
 - **Pricing: Free** — `scripts/asc_pricing_free.rb` (POSTs an appPriceSchedule with
   the USA free price point; spaceship has no support for this). DONE.
-- **App Privacy: "no data collected"** — `bundle exec fastlane ios privacy` with
+- **App Privacy** — `bundle exec fastlane ios privacy` with
   `FASTLANE_USER=<apple id>` (or the ASC web UI). The payload is
-  `fastlane/app_privacy_details.json` (`DATA_NOT_COLLECTED`), matching
-  `PRIVACY.md`: session logs and forecasts never leave the device. This is the
+  `fastlane/app_privacy_details.json`: Product Interaction + Coarse Location,
+  Analytics purpose, not linked to the user, not used for tracking — the
+  self-hosted Umami screen-view analytics added 2026-10-02 (`platform/Analytics.kt`),
+  matching `PRIVACY.md` and `iosApp/iosApp/PrivacyInfo.xcprivacy`. Session logs
+  and forecasts still never leave the device. Re-publish the answers in ASC
+  after any change to what the app sends. This is the
   one gate the API key cannot clear — the `apps/<id>/dataUsages` resources exist
   only on the iris API behind an Apple ID web session, so the lane prompts for
   2FA.

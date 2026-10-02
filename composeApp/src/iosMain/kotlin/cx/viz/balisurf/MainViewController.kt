@@ -5,10 +5,12 @@ import androidx.compose.ui.window.ComposeUIViewController
 import cx.viz.balisurf.data.IosLogFileIo
 import cx.viz.balisurf.data.OpenMeteoForecastSource
 import cx.viz.balisurf.data.SessionLogStore
+import cx.viz.balisurf.platform.Analytics
 import cx.viz.balisurf.ui.App
 import cx.viz.balisurf.ui.AppModule
 
 fun MainViewController() = ComposeUIViewController {
+    Analytics.enabled = true
     val module = remember {
         AppModule(
             forecast = OpenMeteoForecastSource(),

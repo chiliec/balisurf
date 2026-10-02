@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import cx.viz.balisurf.data.AndroidLogFileIo
 import cx.viz.balisurf.data.OpenMeteoForecastSource
 import cx.viz.balisurf.data.SessionLogStore
+import cx.viz.balisurf.platform.Analytics
 import cx.viz.balisurf.ui.App
 import cx.viz.balisurf.ui.AppModule
 
@@ -14,6 +15,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        Analytics.enabled = true
         val module = AppModule(
             forecast = OpenMeteoForecastSource(),
             logs = SessionLogStore(AndroidLogFileIo(applicationContext)),
