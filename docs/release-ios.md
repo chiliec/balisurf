@@ -49,6 +49,6 @@ Once App Privacy is published:
 gh workflow run ios-appstore.yml -f lane=submit
 ```
 
-The submit lane attaches the latest valid build (build 1 is `VALID` /
+The submit lane (`AUTO_RELEASE=1` → release on approval, else manual release) attaches the latest valid build (build 1 is `VALID` /
 `APP_STORE_ELIGIBLE`, `usesNonExemptEncryption=false`) and declares export
 compliance + no-IDFA, then submits 1.0.0 for review. Release is manual.

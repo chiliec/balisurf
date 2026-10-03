@@ -298,7 +298,7 @@ platform :ios do
       skip_metadata: true,
       skip_screenshots: true,
       submit_for_review: true,
-      automatic_release: false,
+      automatic_release: ENV["AUTO_RELEASE"] == "1",   # AUTO_RELEASE=1 → release on approval
       precheck_include_in_app_purchases: false,
       run_precheck_before_submit: false,
       submission_information: {
