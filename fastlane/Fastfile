@@ -307,6 +307,14 @@ platform :ios do
       },
       force: true
     )
+    # deliver only writes releaseType while uploading metadata, which skip_metadata
+    # bypasses — so set it directly (verified 2026-10-03: the flag alone left MANUAL).
+    if ENV["AUTO_RELEASE"] == "1"
+      Spaceship::ConnectAPI::App.find(APP_IDENTIFIER)
+        .get_app_store_versions(filter: { versionString: APP_VERSION }).first
+        .update(attributes: { releaseType: "AFTER_APPROVAL" })
+      UI.success("Release type set to AFTER_APPROVAL")
+    end
   end
 end
 
